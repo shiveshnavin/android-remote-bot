@@ -1,0 +1,85 @@
+import { MultiDbORM } from 'multi-db-orm';
+import PipeLane, { PipeTask, PipeTaskDescription } from 'pipelane';
+
+interface FetchSchedulesTaskInputs {
+    additionalInputs: {
+        subType: string;
+        limit: number;
+        tenant: string;
+    };
+}
+
+export class FetchSchedulesTask extends PipeTask<any, any> {
+    static TASK_VARIANT_NAME: string = 'fetch-schedules';
+    static TASK_TYPE_NAME: string = 'fetch-schedules';
+
+    private db: MultiDbORM;
+    private tableName = 'smauto_posts_schedule_android_bot';
+
+    constructor(variantName?: string, db?: MultiDbORM) {
+        super(FetchSchedulesTask.TASK_TYPE_NAME, variantName || FetchSchedulesTask.TASK_VARIANT_NAME);
+        if (!db) {
+           throw new Error('Must provide `db` for task `FetchSchedulesTask`');
+        }
+        this.db = db;
+    }
+
+    kill(): boolean {
+        return true;
+    }
+
+    describe(): PipeTaskDescription | undefined {
+        return {
+            summary: 'Fetches scheduled media items based on subType and limit.',
+            inputs: {
+                last:[],
+                additionalInputs: {
+                    tenant:'Username',
+                    subType: 'The subType of media to fetch.',
+                    limit: 'The maximum number of videos to fetch.',
+                },
+            },
+        };
+    }
+
+    async execute(
+        pipeWorksInstance: PipeLane,
+        input: FetchSchedulesTaskInputs
+    ): Promise<any[]> {
+        try {
+            const { subType, limit, tenant } = input.additionalInputs;
+            if(!subType){
+                return [{
+                    status:false,
+                    message: 'subType is required'
+                }]
+            }
+            const filter: any = { status: 'SCHEDULED', subType: subType };
+            if(tenant){
+                filter.tenant = tenant
+            }
+            const options:any =  {
+                apply: {
+                    field: 'timeStamp',
+                    sort: 'asc'
+                },
+                limit: limit || 1
+            }
+
+            const result = await this.db.get(this.tableName, filter, options);
+            if(!result) {
+                return [{
+                    status: false,
+                    message:'No schedules found'
+                }]
+            }
+            return result;
+        } catch (error) {
+            this.onLog(`Error fetching schedules: ${error.message}`);
+            return [{
+                status:false,
+                message:`Error fetching schedules: ${error.message}`
+            }];
+        }
+    }
+}

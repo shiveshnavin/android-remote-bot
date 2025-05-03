@@ -10,6 +10,8 @@ const db = new FireStoreDB(dbCreds)
 const PORT = 8080
 
 
+
+
 app.use('/bot', (req, res) => {
     res.send({
         status: 'Bot up'
@@ -18,6 +20,16 @@ app.use('/bot', (req, res) => {
 
 creatPipelaneServer(VariantConfig, db).then(pipelaneApp => {
     app.use('/pipelane', pipelaneApp)
+    app.get('/**', (req, res, next) => {
+        if (req.originalUrl.startsWith('/pipeline')) {
+            return next();
+        } else {
+            const newUrl = '/pipelane' + req.originalUrl;
+            console.log(`Redirecting from '${req.originalUrl}' to '${newUrl}'`);
+            return res.redirect(newUrl);
+        }
+    });
+
     app.listen(PORT, () => {
         console.log('Android bot server started. Listening on port', PORT)
     })
