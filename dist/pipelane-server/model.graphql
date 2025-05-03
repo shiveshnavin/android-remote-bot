@@ -1,0 +1,152 @@
+#graphql
+type Query {
+  Pipelane(name: ID!): Pipelane
+  Pipetask(name: ID!, pipelaneName: ID!): Pipetask
+  TaskType(type: ID!): TaskType
+  PipelaneExecution(id: ID!): PipelaneExecution
+
+  taskTypes: [TaskType]
+  pipelanes(search: String): [Pipelane]
+  pipelaneTasks(pipelaneName: ID!): [Pipetask]
+  executions(limit: Int): [PipelaneExecution]
+  pipelaneExecutions(pipelaneName: ID!, limit: Int): [PipelaneExecution]
+}
+
+type TaskType {
+  type: ID!
+  variants: [ID]
+  description: TaskTypeDescription
+}
+
+scalar ANY
+
+type TaskTypeInput {
+  last: [ANY]
+  additionalInputs: ANY
+}
+
+type TaskTypeDescription {
+  summary: String
+  inputs: TaskTypeInput
+}
+
+type Pipelane {
+  name: ID!
+  input: String
+  schedule: String
+  active: Boolean
+  updatedTimestamp: String
+  retryCount: Int
+  executionsRetentionCount: Int
+  nextRun: String
+  tasks: [Pipetask]
+  executions: [PipelaneExecution]
+}
+
+input CreatePipelanePayload {
+  name: ID!
+  input: String
+  schedule: String
+  retryCount: Int
+  executionsRetentionCount: Int
+  active: Boolean
+  tasks: [CreatePipetaskPayload]
+}
+
+type Pipetask {
+  name: ID!
+  step: Int
+  pipelaneName: ID!
+  taskVariantName: String
+  taskTypeName: ID!
+  active: Boolean
+  isParallel: Boolean
+  input: String
+  executions: [PipetaskExecution]
+}
+
+input CreatePipetaskPayload {
+  name: ID!
+  pipelaneName: ID!
+  taskVariantName: String
+  taskTypeName: ID!
+  isParallel: Boolean
+  active: Boolean
+  input: String
+  step: Int
+}
+
+type PipelaneExecution {
+  id: ID!
+  name: ID!
+  definition: Pipelane
+  tasks: [PipetaskExecution]
+  startTime: String
+  status: Status
+  endTime: String
+  output: String
+}
+
+type PipetaskExecution {
+  id: ID!
+  pipelaneExId: ID!
+  name: ID!
+  pipelaneName: ID!
+  definition: Pipetask
+  startTime: String
+  status: Status
+  endTime: String
+  output: String
+}
+
+input PipelaneExecutionPayload {
+  id: ID!
+  name: ID!
+  startTime: String
+  status: Status
+  endTime: String
+  output: String
+}
+
+input PipetaskExecutionPayload {
+  id: ID!
+  pipelaneExId: ID!
+  name: ID!
+  pipelaneName: ID!
+  startTime: String
+  status: Status
+  endTime: String
+  output: String
+}
+enum Status {
+  SUCCESS
+  IN_PROGRESS
+  PAUSED
+  FAILED
+  PARTIAL_SUCCESS
+  SKIPPED
+}
+
+type PipelaneMeta {
+  pkey: ID!
+  pval: String
+}
+
+enum PipelaneAction {
+  CREATE
+  UPDATE
+}
+
+type Mutation {
+  createPipelane(data: CreatePipelanePayload!, oldPipeName: ID): Pipelane!
+  createPipelaneTask(data: CreatePipetaskPayload!, oldTaskName: ID): Pipetask!
+  deletePipelane(name: ID!): Status!
+  clonePipelane(name: ID!): Pipelane!
+  deletePipelaneTask(pipelaneName: ID!, name: ID!): Status!
+  createPipelaneExecution(data: PipelaneExecutionPayload!): PipelaneExecution!
+  createPipelaneTaskExecution(
+    data: PipetaskExecutionPayload!
+  ): PipetaskExecution!
+
+  executePipelane(name: ID!, input: String): PipetaskExecution!
+}
