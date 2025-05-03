@@ -106,7 +106,7 @@ export class PostToInstagram extends PipeTask<any, any> {
                 await shareFile(targetFile, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity")
                 await igGoNextShare()
                 await igEnterCaptionAndPost(caption)
-
+                await bot.turnOffScreen()
                 model.status = true
 
             } catch (error) {

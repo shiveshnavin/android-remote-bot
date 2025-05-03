@@ -68,6 +68,7 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 await (0, __1.shareFile)(targetFile, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity");
                 await (0, __1.igGoNextShare)();
                 await (0, __1.igEnterCaptionAndPost)(caption);
+                await bot.turnOffScreen();
                 model.status = true;
             }
             catch (error) {
