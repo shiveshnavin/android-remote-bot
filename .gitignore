@@ -1,0 +1,8 @@
+node_modules/
+.vscode/
+workspace/
+dump.xml
+sftp-config.json
+.env
+package-lock.json
+firebase-creds.json
