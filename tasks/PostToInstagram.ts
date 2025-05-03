@@ -98,9 +98,9 @@ export class PostToInstagram extends PipeTask<any, any> {
                 let targetFile = downloadDir + "/" + fileName
                 let downloadCmd = `wget -P ${targetFile} ${url}`
 
-                await bot.executeCommand(downloadCmd)
-                this.onLog(fileName, 'downloaded to', targetFile)
+                this.onLog(fileName, 'downloading to', targetFile)
                 this.onLog('Posting start: ', caption)
+                await bot.executeCommand(downloadCmd)
 
             } catch (error) {
                 this.onLog(`Error processing schedule: ${error.message}`);
