@@ -221,6 +221,7 @@ class AndroidBot {
     }
     // Execute adb command
     executeCommand(command) {
+        console.log("exec: " + command);
         return new Promise((resolve, reject) => {
             (0, child_process_1.exec)(command, (error, stdout, stderr) => {
                 if (error) {

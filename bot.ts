@@ -245,6 +245,7 @@ export class AndroidBot {
 
   // Execute adb command
   executeCommand(command: string): Promise<string> {
+    console.log("exec: " + command)
     return new Promise((resolve, reject) => {
       exec(command, (error, stdout, stderr) => {
         if (error) {
