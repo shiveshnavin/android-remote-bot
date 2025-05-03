@@ -1,13 +1,21 @@
-const xml2js = require("xml2js");
+import * as xml2js from "xml2js";
+
+interface Node {
+  $?: { [key: string]: string };
+  node?: Node[];
+}
 
 class XmlUtils {
-  constructor(xmlString) {
+  private xmlString?: string;
+  public xmlJson: any | null;
+
+  constructor(xmlString?: string) {
     this.xmlString = xmlString;
     this.xmlJson = null;
   }
 
   // Parse the XML string into a JavaScript object
-  parseXml(xmlString) {
+  parseXml(xmlString?: string): Promise<any> {
     const parser = new xml2js.Parser();
     return new Promise((resolve, reject) => {
       parser.parseString(xmlString || this.xmlString, (err, result) => {
@@ -22,7 +30,7 @@ class XmlUtils {
   }
 
   // Find the node with the given label in the 'text' attribute
-  async findNodeByLabel(label) {
+  async findNodeByLabel(label: string): Promise<Node | null> {
     // Parse the XML before searching
     if (!this.xmlJson) {
       await this.parseXml();
@@ -32,7 +40,7 @@ class XmlUtils {
     const root = this.xmlJson.hierarchy.node;
 
     // Recursive function to search through the XML
-    const searchNode = (node) => {
+    const searchNode = (node: Node): Node | null => {
       // Check if the 'text' attribute matches the label
       if (node.$ && node.$.text && node.$.text.includes(label)) {
         return node;
@@ -57,7 +65,9 @@ class XmlUtils {
     }
     return null;
   }
-  async findNodeByAttr(attr, attrValue) {
+
+  // Find the node with the given attribute and value
+  async findNodeByAttr(attr: string, attrValue: string): Promise<Node | null> {
     // Parse the XML before searching
     if (!this.xmlJson) {
       await this.parseXml();
@@ -67,7 +77,7 @@ class XmlUtils {
     const root = this.xmlJson.hierarchy.node;
 
     // Recursive function to search through the XML
-    const searchNode = (node) => {
+    const searchNode = (node: Node): Node | null => {
       // Check if the attribute matches the target value
       if (node.$ && node.$[attr] && node.$[attr].includes(attrValue)) {
         return node;
@@ -94,10 +104,12 @@ class XmlUtils {
 
     return null;
   }
-  getBounds(node) {
+
+  // Get bounds of the node and return the center coordinates
+  getBounds(node: Node): { x: number; y: number } | null {
     let bounds = node?.$?.bounds;
     // Example bounds format: '[403,1017][1074,1059]'
-    const match = bounds.match(/\[(\d+),(\d+)\]\[(\d+),(\d+)\]/);
+    const match = bounds?.match(/\[(\d+),(\d+)\]\[(\d+),(\d+)\]/);
     if (match) {
       const left = parseInt(match[1], 10);
       const top = parseInt(match[2], 10);
@@ -113,4 +125,4 @@ class XmlUtils {
   }
 }
 
-module.exports = XmlUtils;
+export { XmlUtils };

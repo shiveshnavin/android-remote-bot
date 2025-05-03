@@ -1,15 +1,17 @@
-const AndroidBot = require("./bot");
-const XmlUtils = require("./xml");
-const fs = require("fs");
-require("dotenv").config();
+import { AndroidBot } from "./bot";
+import { XmlUtils } from "./xml";
+import * as fs from "fs";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 const bot = new AndroidBot();
 
-async function loginInstagram() {
+async function loginInstagram(): Promise<void> {
   if (!(await bot.isScreenOn())) {
     await bot.turnOnScreen();
   }
-  bot.openActivity(
+  await bot.openActivity(
     "com.instagram.android/com.instagram.android.activity.MainTabActivity"
   );
   let screenJson = await bot.dumpScreenXml();
@@ -20,13 +22,13 @@ async function loginInstagram() {
   if (userNameField) {
     await bot.clickNode(userNameField);
     await bot.sleep(2000);
-    await bot.clearInputField();
+    await bot.clearInputField(10); // Assuming 10 is the number of key strokes
     await bot.sleep(1000);
-    await bot.typeText(process.env.IG_USER);
+    await bot.typeText(process.env.IG_USER || "");
 
     let passwordField = await bot.findElementByLabel("Password", screenJson);
     await bot.clickNode(passwordField);
-    await bot.clearInputField();
+    await bot.clearInputField(10); // Assuming 10 is the number of key strokes
     await bot.typeText("greatking");
     await bot.sleep(1000);
     await bot.pressEnterKey();
@@ -39,7 +41,7 @@ async function loginInstagram() {
   }
 }
 
-async function shareFile() {
+async function shareFile(): Promise<void> {
   const filePath = "/storage/emulated/0/Download/ttxx.mp4";
   await bot.scanFile(filePath);
   let mediaId = await bot.getMediaIdFromPath(filePath);
@@ -52,13 +54,13 @@ async function shareFile() {
   }
 }
 
-async function postReel() {
+async function postReel(): Promise<void> {
   let screenJson = await bot.dumpScreenXml();
   let nextBtn = await bot.findElementByLabel("Next", screenJson);
   await bot.clickNode(nextBtn);
 }
 
-async function enterCaptionAndpost() {
+async function enterCaptionAndPost(): Promise<void> {
   let screenJson = await bot.dumpScreenXml();
   let captionInput = await bot.findElementByAttribute(
     "resource-id",
@@ -66,7 +68,7 @@ async function enterCaptionAndpost() {
     screenJson
   );
   await bot.clickNode(captionInput);
-  await bot.clearInputField();
+  await bot.clearInputField(10); // Assuming 10 is the number of key strokes
   await bot.sleep(1000);
   await bot.typeText("Checkout");
   await bot.sleep(1000);
@@ -81,14 +83,15 @@ async function enterCaptionAndpost() {
   let moreOptions = await bot.findElementByLabel("Share", screenJson);
   if (moreOptions) await bot.clickNode(moreOptions);
   if (shareBtn) await bot.clickNode(shareBtn);
-  console.log("Waiting for 20sec for instagram to finish upload");
+  console.log("Waiting for 20sec for Instagram to finish upload");
   await bot.sleep(20000);
   await bot.killApp("com.instagram.android");
 }
-async function shareAndPost() {
+
+async function shareAndPost(): Promise<void> {
   await shareFile();
   await postReel();
-  await enterCaptionAndpost();
+  await enterCaptionAndPost();
 }
 
 shareAndPost();

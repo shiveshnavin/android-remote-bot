@@ -1,21 +1,25 @@
-const { exec } = require("child_process");
-const fs = require("fs");
-const XmlUtils = require("./xml");
-const path = require("path");
+import { exec } from "child_process";
+import fs from "fs";
+import path from "path";
+import { XmlUtils } from "./xml";
+
 console.log("Android BOT");
+
 let wsdir = "./workspace";
 if (!fs.existsSync(wsdir)) {
   fs.mkdirSync(wsdir);
 }
 
-class AndroidBot {
-  async killApp(pkg) {
+export class AndroidBot {
+  // Method to kill app by package name
+  async killApp(pkg: string): Promise<void> {
     await this.executeCommand(`adb shell am force-stop ${pkg}`);
     console.log("killed app ", pkg);
   }
-  async hideKeyboardIfVisible() {
+
+  // Method to hide keyboard if it's visible
+  async hideKeyboardIfVisible(): Promise<void> {
     try {
-      // Check if the keyboard is visible
       const keyboardVisible = await this.isKeyboardVisible();
 
       if (keyboardVisible) {
@@ -29,14 +33,13 @@ class AndroidBot {
     }
   }
 
-  async isKeyboardVisible() {
+  // Method to check if keyboard is visible
+  async isKeyboardVisible(): Promise<boolean> {
     try {
-      // Run the command to check if the keyboard is visible
       const output = await this.executeCommand(
-        "adb shell dumpsys input_method | grep -i 'mInputShown'"
+        'adb shell dumpsys input_method | grep -i "mInputShown"'
       );
 
-      // If the output contains 'mInputShown=true', the keyboard is visible
       return output.includes("mInputShown=true");
     } catch (error) {
       console.error("Error checking keyboard visibility:", error);
@@ -44,9 +47,9 @@ class AndroidBot {
     }
   }
 
-  async shareVideoById(mediaId, targetActivity) {
+  // Method to share video by media ID
+  async shareVideoById(mediaId: string, targetActivity: string): Promise<void> {
     try {
-      // Construct the share intent for the active app (e.g., Instagram)
       const shareCommand = ` adb shell am start -a android.intent.action.SEND   -t video/*   --eu android.intent.extra.STREAM content://media/external/video/media/${mediaId}   -n ${targetActivity}   --grant-read-uri-permission`;
       await this.executeCommand(shareCommand);
 
@@ -57,9 +60,9 @@ class AndroidBot {
     }
   }
 
-  async scanFile(filePath) {
+  // Method to scan a file and add it to the media database
+  async scanFile(filePath: string): Promise<void> {
     try {
-      // Execute the scan media command to add the file to the media database
       const command = `adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file://${filePath}`;
       await this.executeCommand(command);
       console.log(
@@ -71,7 +74,8 @@ class AndroidBot {
     }
   }
 
-  async getMediaIdFromPath(filePath) {
+  // Method to get media ID from file path
+  async getMediaIdFromPath(filePath: string): Promise<string> {
     try {
       const fileName = path.basename(filePath);
       const queryCommand = `adb shell content query --uri content://media/external/video/media --projection _id:_data | grep '${fileName}'`;
@@ -90,23 +94,32 @@ class AndroidBot {
     }
   }
 
-  async pressBackKey() {
-    const command = `adb shell input keyevent 4`;
+  // Method to simulate back key press
+  async pressBackKey(): Promise<void> {
+    const command = "adb shell input keyevent 4";
     await this.executeCommand(command);
   }
-  async pressEnterKey() {
-    const command = `adb shell input keyevent 66`;
+
+  // Method to simulate enter key press
+  async pressEnterKey(): Promise<void> {
+    const command = "adb shell input keyevent 66";
     await this.executeCommand(command);
   }
-  async sleep(ms) {
+
+  // Sleep method
+  async sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
-  async clearInputField(strokes) {
+
+  // Clear input field by simulating backspace key presses
+  async clearInputField(strokes: number): Promise<void> {
     const keyEvents = Array(strokes).fill("67").join(" ");
     const command = `adb shell input keyevent ${keyEvents}`;
     await this.executeCommand(command);
   }
-  async typeText(text) {
+
+  // Type text into the device's input field
+  async typeText(text: string): Promise<string> {
     try {
       const safeText = text
         .replace(/ /g, "%s") // Replace spaces with %s
@@ -120,7 +133,13 @@ class AndroidBot {
       throw error;
     }
   }
-  async findElementByAttribute(attr, value, screenJson) {
+
+  // Find element by attribute
+  async findElementByAttribute(
+    attr: string,
+    value: string,
+    screenJson?: any
+  ): Promise<any> {
     const xml = new XmlUtils();
     if (!screenJson) {
       screenJson = await this.dumpScreenXml();
@@ -132,7 +151,9 @@ class AndroidBot {
       return node;
     }
   }
-  async findElementByLabel(label, screenJson) {
+
+  // Find element by label
+  async findElementByLabel(label: string, screenJson?: any): Promise<any> {
     const xml = new XmlUtils();
     if (!screenJson) {
       screenJson = await this.dumpScreenXml();
@@ -144,12 +165,16 @@ class AndroidBot {
       return node;
     }
   }
-  async clickNode(node) {
+
+  // Click on a node
+  async clickNode(node: any): Promise<void> {
     const xml = new XmlUtils();
-    let bounts = xml.getBounds(node);
-    await this.clickAt(bounts.x, bounts.y);
+    const bounds = xml.getBounds(node) as any;
+    await this.clickAt(bounds.x, bounds.y);
   }
-  async clickAt(x, y) {
+
+  // Click at specific coordinates
+  async clickAt(x: number, y: number): Promise<any> {
     try {
       const command = `adb shell input tap ${x} ${y}`;
       const result = await this.executeCommand(command);
@@ -161,7 +186,8 @@ class AndroidBot {
     }
   }
 
-  async dumpScreenXml() {
+  // Dump screen XML layout
+  async dumpScreenXml(): Promise<any> {
     try {
       let dumpFile = "/sdcard/window_dump.xml";
       await this.executeCommand("adb shell uiautomator dump " + dumpFile);
@@ -175,7 +201,8 @@ class AndroidBot {
     }
   }
 
-  async openActivity(activityName) {
+  // Open a specific activity
+  async openActivity(activityName: string): Promise<any> {
     try {
       const command = `adb shell am start -n ${activityName}`;
       const result = await this.executeCommand(command);
@@ -194,23 +221,26 @@ class AndroidBot {
     }
   }
 
-  async turnOnScreen() {
+  // Turn on the screen
+  async turnOnScreen(): Promise<void> {
     await this.executeCommand("adb shell input keyevent KEYCODE_WAKEUP");
     await this.executeCommand("adb shell input keyevent KEYCODE_MENU");
   }
 
-  isScreenOn() {
+  // Check if the screen is on
+  isScreenOn(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.executeCommand(
         "su -c dumpsys power | grep mHalInteractiveModeEnabled"
       ).then((stdout) => {
         const screenIsOn = stdout.includes("mHalInteractiveModeEnabled=true");
-        resolve(screenIsOn); // return true if screen is OFF
+        resolve(screenIsOn);
       });
     });
   }
 
-  executeCommand(command) {
+  // Execute adb command
+  executeCommand(command: string): Promise<string> {
     return new Promise((resolve, reject) => {
       exec(command, (error, stdout, stderr) => {
         if (error) {
@@ -227,5 +257,3 @@ class AndroidBot {
 
 const bot = new AndroidBot();
 // bot.turnOnScreen().then(console.log);
-
-module.exports = AndroidBot;
