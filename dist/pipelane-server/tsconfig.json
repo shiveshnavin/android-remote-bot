@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "jsx": "react",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "module": "nodenext",
+        "target": "esNext",
+        "declaration": true,
+        "outDir": "./dist",
+        "types": [
+            "node"
+        ]
+    },
+    "include": [
+        "**/**/**/*"
+    ],
+    "exclude": [
+        "node_modules/**/**/*",
+    ]
+}
