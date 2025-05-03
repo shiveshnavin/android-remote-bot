@@ -1,4 +1,3 @@
-import { MultiDbORM } from 'multi-db-orm';
 import PipeLane, { PipeTask, PipeTaskDescription } from 'pipelane';
 import { ErrorOutput } from '../pipelane-server/server/pipe-tasks';
 import { AndroidBot } from '../bot';
@@ -25,13 +24,13 @@ interface PostToInstagramInputs {
     };
 }
 
-export class FetchSchedulesTask extends PipeTask<any, any> {
+export class PostToInstagram extends PipeTask<any, any> {
     static TASK_VARIANT_NAME: string = 'instagram-bot';
     static TASK_TYPE_NAME: string = 'android-bot';
 
     bot: AndroidBot
     constructor() {
-        super(FetchSchedulesTask.TASK_TYPE_NAME, FetchSchedulesTask.TASK_VARIANT_NAME);
+        super(PostToInstagram.TASK_TYPE_NAME, PostToInstagram.TASK_VARIANT_NAME);
         this.bot = new AndroidBot()
     }
 

@@ -19,7 +19,7 @@ interface PostToInstagramInputs {
     last: ScheduleModel[];
     additionalInputs: {};
 }
-export declare class FetchSchedulesTask extends PipeTask<any, any> {
+export declare class PostToInstagram extends PipeTask<any, any> {
     static TASK_VARIANT_NAME: string;
     static TASK_TYPE_NAME: string;
     bot: AndroidBot;

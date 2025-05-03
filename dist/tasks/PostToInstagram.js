@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FetchSchedulesTask = void 0;
+exports.PostToInstagram = void 0;
 const pipelane_1 = require("pipelane");
 const bot_1 = require("../bot");
-class FetchSchedulesTask extends pipelane_1.PipeTask {
+class PostToInstagram extends pipelane_1.PipeTask {
     static TASK_VARIANT_NAME = 'instagram-bot';
     static TASK_TYPE_NAME = 'android-bot';
     bot;
     constructor() {
-        super(FetchSchedulesTask.TASK_TYPE_NAME, FetchSchedulesTask.TASK_VARIANT_NAME);
+        super(PostToInstagram.TASK_TYPE_NAME, PostToInstagram.TASK_VARIANT_NAME);
         this.bot = new bot_1.AndroidBot();
     }
     kill() {
@@ -50,4 +50,4 @@ class FetchSchedulesTask extends pipelane_1.PipeTask {
     async wakeDevice() {
     }
 }
-exports.FetchSchedulesTask = FetchSchedulesTask;
+exports.PostToInstagram = PostToInstagram;
