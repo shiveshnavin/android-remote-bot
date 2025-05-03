@@ -227,6 +227,10 @@ export class AndroidBot {
     await this.executeCommand("adb shell input keyevent KEYCODE_MENU");
   }
 
+  async turnOffScreen(): Promise<void> {
+    await this.executeCommand("adb shell input keyevent 26");
+  }
+
   // Check if the screen is on
   isScreenOn(): Promise<boolean> {
     return new Promise((resolve, reject) => {

@@ -17,6 +17,7 @@ export declare class AndroidBot {
     dumpScreenXml(): Promise<any>;
     openActivity(activityName: string): Promise<any>;
     turnOnScreen(): Promise<void>;
+    turnOffScreen(): Promise<void>;
     isScreenOn(): Promise<boolean>;
     executeCommand(command: string): Promise<string>;
 }

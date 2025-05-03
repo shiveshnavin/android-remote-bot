@@ -34,7 +34,8 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shareFile = shareFile;
-exports.goNextReelIg = goNextReelIg;
+exports.igGoNextShare = igGoNextShare;
+exports.igEnterCaptionAndPost = igEnterCaptionAndPost;
 const bot_1 = require("./bot");
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
@@ -75,18 +76,18 @@ async function shareFile(filePath, activity) {
         await bot.shareVideoById(mediaId, activity);
     }
 }
-async function goNextReelIg() {
+async function igGoNextShare() {
     let screenJson = await bot.dumpScreenXml();
     let nextBtn = await bot.findElementByLabel("Next", screenJson);
     await bot.clickNode(nextBtn);
 }
-async function enterCaptionAndPost() {
+async function igEnterCaptionAndPost(caption) {
     let screenJson = await bot.dumpScreenXml();
     let captionInput = await bot.findElementByAttribute("resource-id", "com.instagram.android:id/caption_input_text_view", screenJson);
     await bot.clickNode(captionInput);
-    await bot.clearInputField(10); // Assuming 10 is the number of key strokes
+    await bot.clearInputField(10);
     await bot.sleep(1000);
-    await bot.typeText("Checkout");
+    await bot.typeText(caption);
     await bot.sleep(1000);
     await bot.hideKeyboardIfVisible();
     await bot.sleep(2000);
@@ -99,12 +100,12 @@ async function enterCaptionAndPost() {
         await bot.clickNode(shareBtn);
     console.log("Waiting for 20sec for Instagram to finish upload");
     await bot.sleep(20000);
-    await bot.killApp("com.instagram.android");
+    // await bot.killApp("com.instagram.android");
 }
 async function shareAndPost() {
     const filePath = "/storage/emulated/0/Download/ttxx.mp4";
     await shareFile(filePath, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity");
-    await goNextReelIg();
-    await enterCaptionAndPost();
+    await igGoNextShare();
+    await igEnterCaptionAndPost("test caption");
 }
 // shareAndPost();

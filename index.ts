@@ -53,13 +53,13 @@ export async function shareFile(filePath: string, activity: string): Promise<voi
   }
 }
 
-export async function goNextReelIg(): Promise<void> {
+export async function igGoNextShare(): Promise<void> {
   let screenJson = await bot.dumpScreenXml();
   let nextBtn = await bot.findElementByLabel("Next", screenJson);
   await bot.clickNode(nextBtn);
 }
 
-async function enterCaptionAndPost(): Promise<void> {
+export async function igEnterCaptionAndPost(caption: string): Promise<void> {
   let screenJson = await bot.dumpScreenXml();
   let captionInput = await bot.findElementByAttribute(
     "resource-id",
@@ -67,9 +67,9 @@ async function enterCaptionAndPost(): Promise<void> {
     screenJson
   );
   await bot.clickNode(captionInput);
-  await bot.clearInputField(10); // Assuming 10 is the number of key strokes
+  await bot.clearInputField(10);
   await bot.sleep(1000);
-  await bot.typeText("Checkout");
+  await bot.typeText(caption);
   await bot.sleep(1000);
   await bot.hideKeyboardIfVisible();
   await bot.sleep(2000);
@@ -84,14 +84,14 @@ async function enterCaptionAndPost(): Promise<void> {
   if (shareBtn) await bot.clickNode(shareBtn);
   console.log("Waiting for 20sec for Instagram to finish upload");
   await bot.sleep(20000);
-  await bot.killApp("com.instagram.android");
+  // await bot.killApp("com.instagram.android");
 }
 
 async function shareAndPost(): Promise<void> {
   const filePath = "/storage/emulated/0/Download/ttxx.mp4";
   await shareFile(filePath, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity");
-  await goNextReelIg();
-  await enterCaptionAndPost();
+  await igGoNextShare();
+  await igEnterCaptionAndPost("test caption");
 }
 
 // shareAndPost();
