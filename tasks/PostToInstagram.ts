@@ -102,6 +102,8 @@ export class PostToInstagram extends PipeTask<any, any> {
                 this.onLog('Posting start: ', caption)
                 await (bot.executeCommand(downloadCmd).catch(e => { }))
 
+                model.status = true
+
             } catch (error) {
                 this.onLog(`Error processing schedule: ${error.message}`);
                 model.status = false
