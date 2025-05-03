@@ -25,6 +25,7 @@
     "node-cron": "^3.0.3",
     "path": "^0.12.7",
     "pipelane": "^2.1.14",
-    "typescript": "^5.4.4"
+    "typescript": "^5.4.4",
+    "firebase-admin": "^13.3.0"
   }
 }
