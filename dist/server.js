@@ -11,6 +11,7 @@ const pipe_tasks_1 = require("./pipelane-server/server/pipe-tasks");
 const FetchSchedulesTask_1 = require("./tasks/FetchSchedulesTask");
 const remote_command_1 = require("./remote-command");
 const PostToInstagram_1 = require("./tasks/PostToInstagram");
+const UpdateSchedulesTask_1 = require("./tasks/UpdateSchedulesTask");
 const app = (0, express_1.default)();
 const firebaseCreds = fs_1.default.readFileSync('firebase-creds.json').toString();
 const dbCreds = JSON.parse(firebaseCreds);
@@ -24,6 +25,7 @@ app.use('/bot', (req, res) => {
     });
 });
 pipe_tasks_1.VariantConfig[FetchSchedulesTask_1.FetchSchedulesTask.TASK_TYPE_NAME] = [new FetchSchedulesTask_1.FetchSchedulesTask(db)];
+pipe_tasks_1.VariantConfig[UpdateSchedulesTask_1.UpdateSchedulesTask.TASK_TYPE_NAME] = [new UpdateSchedulesTask_1.UpdateSchedulesTask(db)];
 pipe_tasks_1.VariantConfig[PostToInstagram_1.PostToInstagram.TASK_TYPE_NAME] = [new PostToInstagram_1.PostToInstagram()];
 (0, pipelane_server_1.creatPipelaneServer)(pipe_tasks_1.VariantConfig, db).then(pipelaneApp => {
     app.use('/pipelane', pipelaneApp);

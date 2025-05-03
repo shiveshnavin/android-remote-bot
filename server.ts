@@ -6,6 +6,7 @@ import { VariantConfig } from './pipelane-server/server/pipe-tasks'
 import { FetchSchedulesTask } from './tasks/FetchSchedulesTask'
 import { initRemoteCommand } from './remote-command'
 import { PostToInstagram } from './tasks/PostToInstagram'
+import { UpdateSchedulesTask } from './tasks/UpdateSchedulesTask'
 const app = express()
 const firebaseCreds = fs.readFileSync('firebase-creds.json').toString()
 const dbCreds = JSON.parse(firebaseCreds)
@@ -25,6 +26,7 @@ app.use('/bot', (req, res) => {
     })
 })
 VariantConfig[FetchSchedulesTask.TASK_TYPE_NAME] = [new FetchSchedulesTask(db)]
+VariantConfig[UpdateSchedulesTask.TASK_TYPE_NAME] = [new UpdateSchedulesTask(db)]
 VariantConfig[PostToInstagram.TASK_TYPE_NAME] = [new PostToInstagram()]
 
 creatPipelaneServer(VariantConfig, db).then(pipelaneApp => {
