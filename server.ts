@@ -2,6 +2,7 @@ import express from 'express'
 import { creatPipelaneServer } from './pipelane-server'
 import { FireStoreDB } from 'multi-db-orm'
 import fs from 'fs'
+import { VariantConfig } from './pipelane-server/server/pipe-tasks'
 const app = express()
 const firebaseCreds = fs.readFileSync('firebase-creds.json').toString()
 const dbCreds = JSON.parse(firebaseCreds)
@@ -15,7 +16,7 @@ app.use('/bot', (req, res) => {
     })
 })
 
-creatPipelaneServer({}, db).then(pipelaneApp => {
+creatPipelaneServer(VariantConfig, db).then(pipelaneApp => {
     app.use('/pipelane', pipelaneApp)
     app.listen(PORT, () => {
         console.log('Android bot server started. Listening on port', PORT)
