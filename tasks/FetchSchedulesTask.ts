@@ -60,7 +60,7 @@ export class FetchSchedulesTask extends PipeTask<any, any> {
             }
             const options: any = {
                 apply: {
-                    field: 'timeStamp',
+                    field: 'nextTimeStamp',
                     sort: 'asc'
                 },
                 limit: limit || 1

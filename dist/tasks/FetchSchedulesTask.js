@@ -45,7 +45,7 @@ class FetchSchedulesTask extends pipelane_1.PipeTask {
             }
             const options = {
                 apply: {
-                    field: 'timeStamp',
+                    field: 'nextTimeStamp',
                     sort: 'asc'
                 },
                 limit: limit || 1

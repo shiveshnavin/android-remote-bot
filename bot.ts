@@ -230,12 +230,12 @@ export class AndroidBot {
   // Check if the screen is on
   isScreenOn(): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.executeCommand(
+      return this.executeCommand(
         "su -c dumpsys power | grep mHalInteractiveModeEnabled"
       ).then((stdout) => {
         const screenIsOn = stdout.includes("mHalInteractiveModeEnabled=true");
         resolve(screenIsOn);
-      });
+      }).catch(reject)
     });
   }
 

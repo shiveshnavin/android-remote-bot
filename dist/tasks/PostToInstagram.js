@@ -47,6 +47,23 @@ class PostToInstagram extends pipelane_1.PipeTask {
                     await bot.turnOnScreen();
                     this.onLog("Woke up device");
                 }
+                let payload = model.payload;
+                if (typeof payload == 'string') {
+                    payload = JSON.parse(payload);
+                }
+                let outpotPostItem = payload.outpotPostItem;
+                if (typeof outpotPostItem == 'string') {
+                    outpotPostItem = JSON.parse(outpotPostItem);
+                }
+                let caption = outpotPostItem.text;
+                let url = payload.generated_file_url;
+                let fileName = getFilenameFromUrl(url);
+                let downloadDir = '/sdcard/Download';
+                let targetFile = downloadDir + "/" + fileName;
+                let downloadCmd = `wget -P ${targetFile} ${url}`;
+                await bot.executeCommand(downloadCmd);
+                this.onLog(fileName, 'downloaded to', targetFile);
+                this.onLog('Posting start: ', caption);
             }
             catch (error) {
                 this.onLog(`Error processing schedule: ${error.message}`);
@@ -60,3 +77,19 @@ class PostToInstagram extends pipelane_1.PipeTask {
     }
 }
 exports.PostToInstagram = PostToInstagram;
+const getFilenameFromUrl = (urlString) => {
+    try {
+        const url = new URL(urlString);
+        // Get the pathname (e.g., '/path/to/file.txt')
+        const pathname = url.pathname;
+        // Find the last slash and take the substring after it
+        const lastSlashIndex = pathname.lastIndexOf('/');
+        const filename = pathname.substring(lastSlashIndex + 1);
+        return filename;
+    }
+    catch (error) {
+        // Handle invalid URLs
+        console.error("Invalid URL:", urlString, error);
+        return ""; // Return empty string for invalid URLs
+    }
+};
