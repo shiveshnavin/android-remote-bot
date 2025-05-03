@@ -41,20 +41,19 @@ async function loginInstagram(): Promise<void> {
   }
 }
 
-async function shareFile(): Promise<void> {
-  const filePath = "/storage/emulated/0/Download/ttxx.mp4";
+export async function shareFile(filePath: string, activity: string): Promise<void> {
   await bot.scanFile(filePath);
   let mediaId = await bot.getMediaIdFromPath(filePath);
   console.log("Inserted mediaId", mediaId);
   if (mediaId) {
     await bot.shareVideoById(
       mediaId,
-      "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity"
+      activity
     );
   }
 }
 
-async function postReel(): Promise<void> {
+export async function goNextReelIg(): Promise<void> {
   let screenJson = await bot.dumpScreenXml();
   let nextBtn = await bot.findElementByLabel("Next", screenJson);
   await bot.clickNode(nextBtn);
@@ -89,9 +88,10 @@ async function enterCaptionAndPost(): Promise<void> {
 }
 
 async function shareAndPost(): Promise<void> {
-  await shareFile();
-  await postReel();
+  const filePath = "/storage/emulated/0/Download/ttxx.mp4";
+  await shareFile(filePath, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity");
+  await goNextReelIg();
   await enterCaptionAndPost();
 }
 
-shareAndPost();
+// shareAndPost();

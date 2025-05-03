@@ -1,6 +1,7 @@
 import PipeLane, { PipeTask, PipeTaskDescription } from 'pipelane';
 import { ErrorOutput } from '../pipelane-server/server/pipe-tasks';
 import { AndroidBot } from '../bot';
+import { goNextReelIg, shareFile } from '..';
 
 export type ScheduleModel = {
     id: string;
@@ -101,6 +102,9 @@ export class PostToInstagram extends PipeTask<any, any> {
                 this.onLog(fileName, 'downloading to', targetFile)
                 this.onLog('Posting start: ', caption)
                 await (bot.executeCommand(downloadCmd).catch(e => { }))
+
+                await shareFile(targetFile, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity")
+                await goNextReelIg()
 
                 model.status = true
 

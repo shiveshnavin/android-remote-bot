@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostToInstagram = void 0;
 const pipelane_1 = require("pipelane");
 const bot_1 = require("../bot");
+const __1 = require("..");
 class PostToInstagram extends pipelane_1.PipeTask {
     static TASK_VARIANT_NAME = 'instagram-bot';
     static TASK_TYPE_NAME = 'android-bot';
@@ -64,6 +65,8 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 this.onLog(fileName, 'downloading to', targetFile);
                 this.onLog('Posting start: ', caption);
                 await (bot.executeCommand(downloadCmd).catch(e => { }));
+                await (0, __1.shareFile)(targetFile, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity");
+                await (0, __1.goNextReelIg)();
                 model.status = true;
             }
             catch (error) {

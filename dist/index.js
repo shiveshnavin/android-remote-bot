@@ -33,6 +33,8 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.shareFile = shareFile;
+exports.goNextReelIg = goNextReelIg;
 const bot_1 = require("./bot");
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
@@ -65,16 +67,15 @@ async function loginInstagram() {
         await bot.pressBackKey();
     }
 }
-async function shareFile() {
-    const filePath = "/storage/emulated/0/Download/ttxx.mp4";
+async function shareFile(filePath, activity) {
     await bot.scanFile(filePath);
     let mediaId = await bot.getMediaIdFromPath(filePath);
     console.log("Inserted mediaId", mediaId);
     if (mediaId) {
-        await bot.shareVideoById(mediaId, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity");
+        await bot.shareVideoById(mediaId, activity);
     }
 }
-async function postReel() {
+async function goNextReelIg() {
     let screenJson = await bot.dumpScreenXml();
     let nextBtn = await bot.findElementByLabel("Next", screenJson);
     await bot.clickNode(nextBtn);
@@ -101,8 +102,9 @@ async function enterCaptionAndPost() {
     await bot.killApp("com.instagram.android");
 }
 async function shareAndPost() {
-    await shareFile();
-    await postReel();
+    const filePath = "/storage/emulated/0/Download/ttxx.mp4";
+    await shareFile(filePath, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity");
+    await goNextReelIg();
     await enterCaptionAndPost();
 }
-shareAndPost();
+// shareAndPost();
