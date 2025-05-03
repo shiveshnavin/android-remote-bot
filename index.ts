@@ -79,7 +79,8 @@ export async function igEnterCaptionAndPost(caption: string): Promise<void> {
     "com.instagram.android:id/share_button",
     screenJson
   );
-  let moreOptions = await bot.findElementByLabel("Share", screenJson);
+  // let moreOptions = await bot.findElementByLabel("Share", screenJson);
+  let moreOptions = await bot.findElementByLabel("Save Draft", screenJson);
   if (moreOptions) await bot.clickNode(moreOptions);
   if (shareBtn) await bot.clickNode(shareBtn);
   console.log("Waiting for 20sec for Instagram to finish upload");

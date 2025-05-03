@@ -93,7 +93,8 @@ async function igEnterCaptionAndPost(caption) {
     await bot.sleep(2000);
     screenJson = await bot.dumpScreenXml();
     let shareBtn = await bot.findElementByAttribute("resource-id", "com.instagram.android:id/share_button", screenJson);
-    let moreOptions = await bot.findElementByLabel("Share", screenJson);
+    // let moreOptions = await bot.findElementByLabel("Share", screenJson);
+    let moreOptions = await bot.findElementByLabel("Save Draft", screenJson);
     if (moreOptions)
         await bot.clickNode(moreOptions);
     if (shareBtn)
