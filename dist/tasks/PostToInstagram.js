@@ -38,10 +38,10 @@ class PostToInstagram extends pipelane_1.PipeTask {
         };
     }
     async execute(pipeWorksInstance, input) {
+        let bot = this.bot;
         let last = input.last;
         for (let model of last) {
             try {
-                let bot = this.bot;
                 let isDeviceOn = await bot.isScreenOn();
                 this.onLog("Is device on =", isDeviceOn);
                 if (!isDeviceOn) {
@@ -68,7 +68,6 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 await (0, __1.shareFile)(targetFile, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity");
                 await (0, __1.igGoNextShare)();
                 await (0, __1.igEnterCaptionAndPost)(caption);
-                await bot.turnOffScreen();
                 model.status = true;
             }
             catch (error) {
@@ -77,6 +76,7 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 model.message = `Error processing schedule: ${error.message}`;
             }
         }
+        await bot.turnOffScreen();
         return last;
     }
     async wakeDevice() {

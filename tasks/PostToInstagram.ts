@@ -68,12 +68,12 @@ export class PostToInstagram extends PipeTask<any, any> {
         pipeWorksInstance: PipeLane,
         input: PostToInstagramInputs
     ): Promise<any[]> {
+        let bot = this.bot
 
         let last = input.last
         for (let model of last) {
             try {
 
-                let bot = this.bot
                 let isDeviceOn = await bot.isScreenOn()
                 this.onLog("Is device on =", isDeviceOn)
                 if (!isDeviceOn) {
@@ -106,7 +106,6 @@ export class PostToInstagram extends PipeTask<any, any> {
                 await shareFile(targetFile, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity")
                 await igGoNextShare()
                 await igEnterCaptionAndPost(caption)
-                await bot.turnOffScreen()
                 model.status = true
 
             } catch (error) {
@@ -115,6 +114,7 @@ export class PostToInstagram extends PipeTask<any, any> {
                 model.message = `Error processing schedule: ${error.message}`
             }
         }
+        await bot.turnOffScreen()
 
         return last
     }
