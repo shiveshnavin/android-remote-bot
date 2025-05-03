@@ -51,7 +51,7 @@ class FetchSchedulesTask extends pipelane_1.PipeTask {
                 limit: limit || 1
             };
             const result = await this.db.get(this.tableName, filter, options);
-            if (!result) {
+            if (!result || result.length == 0) {
                 return [{
                         status: false,
                         message: 'No schedules found'

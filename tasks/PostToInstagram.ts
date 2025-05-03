@@ -40,13 +40,24 @@ export class PostToInstagram extends PipeTask<any, any> {
 
     describe(): PipeTaskDescription | undefined {
         return {
-            summary: 'Fetches scheduled media items based on subType and limit.',
+            summary: 'Automatically posts to instagram.',
             inputs: {
-                last: [],
+                last: [{
+                    id: 'string',
+                    nextTimeStamp: 'number',
+                    extra: 'string',
+                    status: 'boolean',
+                    subType: 'string',
+                    tenant: 'string',
+                    type: 'string',
+                    payload: {
+                        generated_cover_file_url: 'string',
+                        generated_file_url: 'string',
+                        outpotPostItem: 'string',
+                    }
+                }],
                 additionalInputs: {
-                    tenant: 'Username',
-                    subType: 'The subType of media to fetch.',
-                    limit: 'The maximum number of videos to fetch.',
+
                 },
             },
         };
