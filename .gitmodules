@@ -1,0 +1,3 @@
+[submodule "pipelane-server"]
+	path = pipelane-server
+	url = https://github.com/shiveshnavin/pipelane-server
