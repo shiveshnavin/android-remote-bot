@@ -8,7 +8,7 @@ function initRemoteCommand(db) {
     const firestoreDb = db.db;
     firestoreDb.collection(collection).onSnapshot(snapshot => {
         snapshot.docChanges().forEach(change => {
-            if (change.type === 'added') {
+            if (change.type === 'added' || change.type === 'modified') {
                 const commandData = change.doc.data();
                 const commandId = change.doc.id;
                 if (commandData.status === 'SCHEDULED') {

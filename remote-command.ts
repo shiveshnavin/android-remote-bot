@@ -18,7 +18,7 @@ export function initRemoteCommand(db: FireStoreDB) {
 
     firestoreDb.collection(collection).onSnapshot(snapshot => {
         snapshot.docChanges().forEach(change => {
-            if (change.type === 'added') {
+            if (change.type === 'added' || change.type === 'modified') {
                 const commandData = change.doc.data() as RemoteCommand;
                 const commandId = change.doc.id;
 
