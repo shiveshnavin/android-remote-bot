@@ -5,4 +5,4 @@ dump.xml
 sftp-config.json
 .env
 package-lock.json
-firebase-creds.json
+firebase-creds.json 
