@@ -39,7 +39,7 @@ class FetchSchedulesTask extends pipelane_1.PipeTask {
                         message: 'subType is required'
                     }];
             }
-            const filter = { status: 'SCHEDULED', subType: subType };
+            const filter = { status: 'SCHEDULED', type: "ig_android_bot_post", subType: subType };
             if (tenant) {
                 filter.tenant = tenant;
             }

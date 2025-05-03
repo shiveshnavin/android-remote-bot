@@ -9,10 +9,13 @@ const multi_db_orm_1 = require("multi-db-orm");
 const fs_1 = __importDefault(require("fs"));
 const pipe_tasks_1 = require("./pipelane-server/server/pipe-tasks");
 const FetchSchedulesTask_1 = require("./tasks/FetchSchedulesTask");
+const remote_command_1 = require("./remote-command");
 const app = (0, express_1.default)();
 const firebaseCreds = fs_1.default.readFileSync('firebase-creds.json').toString();
 const dbCreds = JSON.parse(firebaseCreds);
 const db = new multi_db_orm_1.FireStoreDB(dbCreds);
+// must use FireStoreDB with this only
+(0, remote_command_1.initRemoteCommand)(db);
 const PORT = 8080;
 app.use('/bot', (req, res) => {
     res.send({
@@ -28,7 +31,6 @@ pipe_tasks_1.VariantConfig[FetchSchedulesTask_1.FetchSchedulesTask.TASK_TYPE_NAM
         }
         else {
             const newUrl = '/pipelane' + req.originalUrl;
-            console.log(`Redirecting from '${req.originalUrl}' to '${newUrl}'`);
             return res.redirect(newUrl);
         }
     });
