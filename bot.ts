@@ -121,11 +121,24 @@ export class AndroidBot {
   // Type text into the device's input field
   async typeText(text: string): Promise<string> {
     try {
-      const safeText = text
-        .replace(/ /g, "%s") // Replace spaces with %s
-        .replace(/(["\\$`])/g, "\\$1"); // Escape problematic characters
-      const command = `adb shell input text "${safeText}"`;
-      const result = await this.executeCommand(command);
+      // Split the text into parts, preserving \n and \t markers
+      const parts = text.split(/(\n|\t)/);
+      let result = '';
+
+      for (const part of parts) {
+        if (part === '\n') {
+          result += await this.executeCommand(`adb shell input keyevent 66`); // Enter key
+        } else if (part === '\t') {
+          result += await this.executeCommand(`adb shell input keyevent 61`); // Tab key
+        } else if (part.length > 0) {
+          const safeText = part
+            .replace(/ /g, "%s") // Replace spaces with %s
+            .replace(/(["\\$`])/g, "\\$1"); // Escape problematic characters
+          const command = `adb shell input text "${safeText}"`;
+          result += await this.executeCommand(command);
+        }
+      }
+
       console.log(`Typed text: ${text}`);
       return result;
     } catch (error) {
