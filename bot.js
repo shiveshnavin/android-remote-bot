@@ -9,6 +9,10 @@ if (!fs.existsSync(wsdir)) {
 }
 
 class AndroidBot {
+  async killApp(pkg) {
+    await this.executeCommand(`adb shell am force-stop ${pkg}`);
+    console.log("killed app ", pkg);
+  }
   async hideKeyboardIfVisible() {
     try {
       // Check if the keyboard is visible
@@ -97,15 +101,17 @@ class AndroidBot {
   async sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
-  async clearInputField() {
-    const command = `adb shell input keyevent 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67`;
+  async clearInputField(strokes) {
+    const keyEvents = Array(strokes).fill("67").join(" ");
+    const command = `adb shell input keyevent ${keyEvents}`;
     await this.executeCommand(command);
   }
-
   async typeText(text) {
     try {
-      const escapedText = text.replace(/(["\\$`])/g, "\\$1"); // escape special characters
-      const command = `adb shell input text "${escapedText}"`;
+      const safeText = text
+        .replace(/ /g, "%s") // Replace spaces with %s
+        .replace(/(["\\$`])/g, "\\$1"); // Escape problematic characters
+      const command = `adb shell input text "${safeText}"`;
       const result = await this.executeCommand(command);
       console.log(`Typed text: ${text}`);
       return result;
@@ -114,7 +120,6 @@ class AndroidBot {
       throw error;
     }
   }
-
   async findElementByAttribute(attr, value, screenJson) {
     const xml = new XmlUtils();
     if (!screenJson) {

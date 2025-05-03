@@ -66,8 +66,29 @@ async function enterCaptionAndpost() {
     screenJson
   );
   await bot.clickNode(captionInput);
-  await bot.typeText("Checkout this cool meme");
+  await bot.clearInputField();
+  await bot.sleep(1000);
+  await bot.typeText("Checkout");
+  await bot.sleep(1000);
   await bot.hideKeyboardIfVisible();
+  await bot.sleep(2000);
+  screenJson = await bot.dumpScreenXml();
+  let shareBtn = await bot.findElementByAttribute(
+    "resource-id",
+    "com.instagram.android:id/share_button",
+    screenJson
+  );
+  let moreOptions = await bot.findElementByLabel("Share", screenJson);
+  if (moreOptions) await bot.clickNode(moreOptions);
+  if (shareBtn) await bot.clickNode(shareBtn);
+  console.log("Waiting for 20sec for instagram to finish upload");
+  await bot.sleep(20000);
+  await bot.killApp("com.instagram.android");
+}
+async function shareAndPost() {
+  await shareFile();
+  await postReel();
+  await enterCaptionAndpost();
 }
 
-enterCaptionAndpost();
+shareAndPost();
