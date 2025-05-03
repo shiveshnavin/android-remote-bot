@@ -3,10 +3,16 @@ import { creatPipelaneServer } from './pipelane-server'
 import { FireStoreDB } from 'multi-db-orm'
 import fs from 'fs'
 import { VariantConfig } from './pipelane-server/server/pipe-tasks'
+import { FetchSchedulesTask } from './tasks/FetchSchedulesTask'
+import { initRemoteCommand } from './remote-command'
 const app = express()
 const firebaseCreds = fs.readFileSync('firebase-creds.json').toString()
 const dbCreds = JSON.parse(firebaseCreds)
 const db = new FireStoreDB(dbCreds)
+
+// must use FireStoreDB with this only
+initRemoteCommand(db)
+
 const PORT = 8080
 
 
@@ -17,7 +23,7 @@ app.use('/bot', (req, res) => {
         status: 'Bot up'
     })
 })
-
+VariantConfig[FetchSchedulesTask.TASK_TYPE_NAME] = [new FetchSchedulesTask(db)]
 creatPipelaneServer(VariantConfig, db).then(pipelaneApp => {
     app.use('/pipelane', pipelaneApp)
     app.get('/**', (req, res, next) => {
@@ -25,7 +31,6 @@ creatPipelaneServer(VariantConfig, db).then(pipelaneApp => {
             return next();
         } else {
             const newUrl = '/pipelane' + req.originalUrl;
-            console.log(`Redirecting from '${req.originalUrl}' to '${newUrl}'`);
             return res.redirect(newUrl);
         }
     });

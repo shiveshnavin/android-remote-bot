@@ -16,10 +16,10 @@ export class FetchSchedulesTask extends PipeTask<any, any> {
     private db: MultiDbORM;
     private tableName = 'smauto_posts_schedule_android_bot';
 
-    constructor(variantName?: string, db?: MultiDbORM) {
-        super(FetchSchedulesTask.TASK_TYPE_NAME, variantName || FetchSchedulesTask.TASK_VARIANT_NAME);
+    constructor(db?: MultiDbORM) {
+        super(FetchSchedulesTask.TASK_TYPE_NAME, FetchSchedulesTask.TASK_VARIANT_NAME);
         if (!db) {
-           throw new Error('Must provide `db` for task `FetchSchedulesTask`');
+            throw new Error('Must provide `db` for task `FetchSchedulesTask`');
         }
         this.db = db;
     }
@@ -32,9 +32,9 @@ export class FetchSchedulesTask extends PipeTask<any, any> {
         return {
             summary: 'Fetches scheduled media items based on subType and limit.',
             inputs: {
-                last:[],
+                last: [],
                 additionalInputs: {
-                    tenant:'Username',
+                    tenant: 'Username',
                     subType: 'The subType of media to fetch.',
                     limit: 'The maximum number of videos to fetch.',
                 },
@@ -48,17 +48,17 @@ export class FetchSchedulesTask extends PipeTask<any, any> {
     ): Promise<any[]> {
         try {
             const { subType, limit, tenant } = input.additionalInputs;
-            if(!subType){
+            if (!subType) {
                 return [{
-                    status:false,
+                    status: false,
                     message: 'subType is required'
                 }]
             }
-            const filter: any = { status: 'SCHEDULED', subType: subType };
-            if(tenant){
+            const filter: any = { status: 'SCHEDULED', type: "ig_android_bot_post", subType: subType };
+            if (tenant) {
                 filter.tenant = tenant
             }
-            const options:any =  {
+            const options: any = {
                 apply: {
                     field: 'timeStamp',
                     sort: 'asc'
@@ -67,18 +67,18 @@ export class FetchSchedulesTask extends PipeTask<any, any> {
             }
 
             const result = await this.db.get(this.tableName, filter, options);
-            if(!result) {
+            if (!result) {
                 return [{
                     status: false,
-                    message:'No schedules found'
+                    message: 'No schedules found'
                 }]
             }
             return result;
         } catch (error) {
             this.onLog(`Error fetching schedules: ${error.message}`);
             return [{
-                status:false,
-                message:`Error fetching schedules: ${error.message}`
+                status: false,
+                message: `Error fetching schedules: ${error.message}`
             }];
         }
     }
