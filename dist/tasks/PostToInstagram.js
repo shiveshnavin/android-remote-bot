@@ -49,7 +49,9 @@ class PostToInstagram extends pipelane_1.PipeTask {
         let bot = this.bot;
         let last = input.last;
         if (!last || last.length == 0) {
-            last = [input.additionalInputs];
+            last = [{
+                    payload: input.additionalInputs
+                }];
         }
         for (let model of last) {
             try {
