@@ -45,6 +45,7 @@ class PostToInstagram extends pipelane_1.PipeTask {
             },
         };
     }
+    posted = [];
     async execute(pipeWorksInstance, input) {
         let bot = this.bot;
         let last = input.last;
@@ -71,6 +72,12 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 }
                 let caption = outpotPostItem.text;
                 let url = payload.generated_file_url;
+                if (this.posted.includes(url)) {
+                    model.status = true;
+                    model.message = `Posted successfully!`;
+                    continue;
+                }
+                this.posted.push(url);
                 let fileName = getFilenameFromUrl(url);
                 let downloadDir = '/sdcard/Download';
                 let targetFile = downloadDir + "/" + fileName;
@@ -82,6 +89,7 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 await (0, __1.igGoNextShare)();
                 await (0, __1.igEnterCaptionAndPost)(caption);
                 model.status = true;
+                model.message = `Posted successfully!`;
             }
             catch (error) {
                 this.onLog(`Error processing schedule: ${error.message}`);

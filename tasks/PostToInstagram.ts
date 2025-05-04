@@ -68,6 +68,7 @@ export class PostToInstagram extends PipeTask<any, any> {
         };
     }
 
+    posted = []
     async execute(
         pipeWorksInstance: PipeLane,
         input: PostToInstagramInputs
@@ -102,7 +103,12 @@ export class PostToInstagram extends PipeTask<any, any> {
 
                 let caption = outpotPostItem.text
                 let url = payload.generated_file_url
-
+                if (this.posted.includes(url)) {
+                    model.status = true
+                    model.message = `Posted successfully!`
+                    continue
+                }
+                this.posted.push(url)
                 let fileName = getFilenameFromUrl(url)
                 let downloadDir = '/sdcard/Download'
                 let targetFile = downloadDir + "/" + fileName
@@ -116,7 +122,7 @@ export class PostToInstagram extends PipeTask<any, any> {
                 await igGoNextShare()
                 await igEnterCaptionAndPost(caption)
                 model.status = true
-
+                model.message = `Posted successfully!`
             } catch (error) {
                 this.onLog(`Error processing schedule: ${error.message}`);
                 model.status = false

@@ -29,6 +29,7 @@ export declare class PostToInstagram extends PipeTask<any, any> {
     constructor();
     kill(): boolean;
     describe(): PipeTaskDescription | undefined;
+    posted: any[];
     execute(pipeWorksInstance: PipeLane, input: PostToInstagramInputs): Promise<any[]>;
     wakeDevice(): Promise<void>;
 }
