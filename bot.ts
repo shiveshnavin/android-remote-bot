@@ -95,8 +95,9 @@ export class AndroidBot {
   }
 
   // Method to simulate back key press
-  async pressBackKey(): Promise<void> {
-    const command = "adb shell input keyevent 4";
+  async pressBackKey(strokes: number = 1): Promise<void> {
+    const keyEvents = Array(strokes).fill("4").join(" ");
+    const command = "adb shell input keyevent " + keyEvents;
     await this.executeCommand(command);
   }
 

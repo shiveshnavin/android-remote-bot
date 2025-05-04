@@ -5,7 +5,7 @@ export declare class AndroidBot {
     shareVideoById(mediaId: string, targetActivity: string): Promise<void>;
     scanFile(filePath: string): Promise<void>;
     getMediaIdFromPath(filePath: string): Promise<string>;
-    pressBackKey(): Promise<void>;
+    pressBackKey(strokes?: number): Promise<void>;
     pressEnterKey(): Promise<void>;
     sleep(ms: number): Promise<void>;
     clearInputField(strokes: number): Promise<void>;

@@ -117,6 +117,7 @@ export class PostToInstagram extends PipeTask<any, any> {
                 this.onLog(fileName, 'downloading to', targetFile)
                 this.onLog('Posting start: ', caption)
                 await (bot.executeCommand(downloadCmd).catch(e => { }))
+                await bot.pressBackKey(5)
                 if (model.tenant) {
                     await bot.openActivity("com.instagram.android/com.instagram.android.activity.MainTabActivity")
                     await switchProfile(model.tenant)

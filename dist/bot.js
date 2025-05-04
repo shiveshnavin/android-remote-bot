@@ -91,8 +91,9 @@ class AndroidBot {
         }
     }
     // Method to simulate back key press
-    async pressBackKey() {
-        const command = "adb shell input keyevent 4";
+    async pressBackKey(strokes = 1) {
+        const keyEvents = Array(strokes).fill("4").join(" ");
+        const command = "adb shell input keyevent " + keyEvents;
         await this.executeCommand(command);
     }
     // Method to simulate enter key press
