@@ -165,13 +165,28 @@ class AndroidBot {
             return node;
         }
     }
-    // Click on a node
+    async clickAndHoldNode(node, durationMs) {
+        const xml = new xml_1.XmlUtils();
+        const bounds = xml.getBounds(node);
+        await this.clickAndHold(bounds.x, bounds.y, durationMs);
+    }
     async clickNode(node) {
         const xml = new xml_1.XmlUtils();
         const bounds = xml.getBounds(node);
         await this.clickAt(bounds.x, bounds.y);
     }
-    // Click at specific coordinates
+    async clickAndHold(x, y, durationMs) {
+        try {
+            const command = `adb shell input swipe ${x} ${y} ${x} ${y} ${durationMs}`;
+            const result = await this.executeCommand(command);
+            console.log(`Tap and Hold at coordinates: x=${x}, y=${y}`);
+            return result;
+        }
+        catch (error) {
+            console.error(`Failed to Tap and Hold at coordinates x=${x}, y=${y}:`, error);
+            throw error;
+        }
+    }
     async clickAt(x, y) {
         try {
             const command = `adb shell input tap ${x} ${y}`;

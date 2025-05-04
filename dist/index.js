@@ -36,6 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.shareFile = shareFile;
 exports.igGoNextShare = igGoNextShare;
 exports.igEnterCaptionAndPost = igEnterCaptionAndPost;
+exports.switchProfile = switchProfile;
 const bot_1 = require("./bot");
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
@@ -108,5 +109,17 @@ async function shareAndPost() {
     await shareFile(filePath, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity");
     await igGoNextShare();
     await igEnterCaptionAndPost("test caption");
+}
+async function switchProfile(newUserName) {
+    let screenJson = await bot.dumpScreenXml();
+    let profileBtn = await bot.findElementByAttribute("resource-id", "com.instagram.android:id/profile_tab", screenJson);
+    await bot.clickAndHoldNode(profileBtn, 2000);
+    let userBtn = await bot.findElementByAttribute("text", newUserName.trim(), screenJson);
+    if (userBtn) {
+        await bot.clickNode(userBtn);
+    }
+    else {
+        throw new Error(`Unable to find user ${newUserName} in list of profiles. is the account logged in?`);
+    }
 }
 // shareAndPost();

@@ -179,14 +179,30 @@ export class AndroidBot {
     }
   }
 
-  // Click on a node
+  async clickAndHoldNode(node: any, durationMs: number) {
+    const xml = new XmlUtils();
+    const bounds = xml.getBounds(node) as any;
+    await this.clickAndHold(bounds.x, bounds.y, durationMs);
+  }
+
   async clickNode(node: any): Promise<void> {
     const xml = new XmlUtils();
     const bounds = xml.getBounds(node) as any;
     await this.clickAt(bounds.x, bounds.y);
   }
 
-  // Click at specific coordinates
+  async clickAndHold(x: number, y: number, durationMs: number): Promise<any> {
+    try {
+      const command = `adb shell input swipe ${x} ${y} ${x} ${y} ${durationMs}`;
+      const result = await this.executeCommand(command);
+      console.log(`Tap and Hold at coordinates: x=${x}, y=${y}`);
+      return result;
+    } catch (error) {
+      console.error(`Failed to Tap and Hold at coordinates x=${x}, y=${y}:`, error);
+      throw error;
+    }
+  }
+
   async clickAt(x: number, y: number): Promise<any> {
     try {
       const command = `adb shell input tap ${x} ${y}`;

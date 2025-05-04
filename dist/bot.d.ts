@@ -12,7 +12,9 @@ export declare class AndroidBot {
     typeText(text: string): Promise<string>;
     findElementByAttribute(attr: string, value: string, screenJson?: any): Promise<any>;
     findElementByLabel(label: string, screenJson?: any): Promise<any>;
+    clickAndHoldNode(node: any, durationMs: number): Promise<void>;
     clickNode(node: any): Promise<void>;
+    clickAndHold(x: number, y: number, durationMs: number): Promise<any>;
     clickAt(x: number, y: number): Promise<any>;
     dumpScreenXml(): Promise<any>;
     openActivity(activityName: string): Promise<any>;

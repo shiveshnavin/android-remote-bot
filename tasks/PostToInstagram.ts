@@ -1,7 +1,7 @@
 import PipeLane, { PipeTask, PipeTaskDescription } from 'pipelane';
 import { ErrorOutput } from '../pipelane-server/server/pipe-tasks';
 import { AndroidBot } from '../bot';
-import { igEnterCaptionAndPost, igGoNextShare, shareFile } from '..';
+import { igEnterCaptionAndPost, igGoNextShare, shareFile, switchProfile } from '..';
 export type ScheduleModelPayload = {
     generated_cover_file_url: string;
     generated_file_url: string;
@@ -117,7 +117,10 @@ export class PostToInstagram extends PipeTask<any, any> {
                 this.onLog(fileName, 'downloading to', targetFile)
                 this.onLog('Posting start: ', caption)
                 await (bot.executeCommand(downloadCmd).catch(e => { }))
-
+                if (model.tenant) {
+                    await bot.openActivity("com.instagram.android/com.instagram.android.activity.MainTabActivity")
+                    await switchProfile(model.tenant)
+                }
                 await shareFile(targetFile, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity")
                 await igGoNextShare()
                 await igEnterCaptionAndPost(caption)
