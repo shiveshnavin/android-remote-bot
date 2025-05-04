@@ -1,6 +1,13 @@
 import PipeLane, { PipeTask, PipeTaskDescription } from 'pipelane';
 import { ErrorOutput } from '../pipelane-server/server/pipe-tasks';
 import { AndroidBot } from '../bot';
+export type ScheduleModelPayload = {
+    generated_cover_file_url: string;
+    generated_file_url: string;
+    outpotPostItem: string | {
+        text: string;
+    };
+};
 export type ScheduleModel = {
     id: string;
     nextTimeStamp: number;
@@ -9,11 +16,7 @@ export type ScheduleModel = {
     subType: string;
     tenant: string;
     type: string;
-    payload: {
-        generated_cover_file_url: string;
-        generated_file_url: string;
-        outpotPostItem: string;
-    };
+    payload: ScheduleModelPayload;
 } & ErrorOutput;
 interface PostToInstagramInputs {
     last: ScheduleModel[];

@@ -1,4 +1,4 @@
-import PipeLane, { InputWithPreviousInputs, OutputWithStatus, PipeTask } from "pipelane";
+import PipeLane, { InputWithPreviousInputs, OutputWithStatus, PipeTask, PipeTaskDescription } from "pipelane";
 export type EvaluateJsTaskInput = InputWithPreviousInputs & {
     last: OutputWithStatus[];
     additionalInputs: {
@@ -18,6 +18,7 @@ export declare class EvaluateJsTask extends PipeTask<EvaluateJsTaskInput, any> {
     timeoutId: any;
     constructor(variantName?: string);
     kill(): boolean;
+    describe(): PipeTaskDescription | undefined;
     evalInScope(js: any, pl: any, input: any, prev: any, axios: any, Utils?: {
         mkdir(path: string): void;
         escapeJSONString(str: string): string;

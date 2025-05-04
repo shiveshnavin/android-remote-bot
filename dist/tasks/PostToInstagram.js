@@ -28,18 +28,29 @@ class PostToInstagram extends pipelane_1.PipeTask {
                         tenant: 'string',
                         type: 'string',
                         payload: {
-                            generated_cover_file_url: 'string',
-                            generated_file_url: 'string',
-                            outpotPostItem: 'string',
+                            generated_cover_file_url: 'string, url of the file',
+                            generated_file_url: 'string, optional, url of the cover file',
+                            outpotPostItem: {
+                                text: 'string, caption text for the post'
+                            },
                         }
                     }],
-                additionalInputs: {},
+                additionalInputs: {
+                    generated_cover_file_url: 'string, url of the file',
+                    generated_file_url: 'string, optional, url of the cover file',
+                    outpotPostItem: {
+                        text: 'string, caption text for the post'
+                    },
+                },
             },
         };
     }
     async execute(pipeWorksInstance, input) {
         let bot = this.bot;
         let last = input.last;
+        if (!last || last.length == 0) {
+            last = [input.additionalInputs];
+        }
         for (let model of last) {
             try {
                 let isDeviceOn = await bot.isScreenOn();

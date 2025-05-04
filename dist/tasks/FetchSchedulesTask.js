@@ -23,9 +23,9 @@ class FetchSchedulesTask extends pipelane_1.PipeTask {
             inputs: {
                 last: [],
                 additionalInputs: {
-                    tenant: 'Username',
-                    subType: 'The subType of media to fetch.',
-                    limit: 'The maximum number of videos to fetch.',
+                    tenant: 'string, Username',
+                    subType: 'string, The subType of media to fetch.',
+                    limit: 'number, The maximum number of videos to fetch.',
                 },
             },
         };

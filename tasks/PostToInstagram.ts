@@ -2,7 +2,11 @@ import PipeLane, { PipeTask, PipeTaskDescription } from 'pipelane';
 import { ErrorOutput } from '../pipelane-server/server/pipe-tasks';
 import { AndroidBot } from '../bot';
 import { igEnterCaptionAndPost, igGoNextShare, shareFile } from '..';
-
+export type ScheduleModelPayload = {
+    generated_cover_file_url: string;
+    generated_file_url: string;
+    outpotPostItem: string | { text: string };
+}
 export type ScheduleModel = {
     id: string;
     nextTimeStamp: number;
@@ -11,11 +15,7 @@ export type ScheduleModel = {
     subType: string;
     tenant: string;
     type: string;
-    payload: {
-        generated_cover_file_url: string;
-        generated_file_url: string;
-        outpotPostItem: string;
-    };
+    payload: ScheduleModelPayload;
 } & ErrorOutput;
 
 interface PostToInstagramInputs {
@@ -52,13 +52,19 @@ export class PostToInstagram extends PipeTask<any, any> {
                     tenant: 'string',
                     type: 'string',
                     payload: {
-                        generated_cover_file_url: 'string',
-                        generated_file_url: 'string',
-                        outpotPostItem: 'string',
+                        generated_cover_file_url: 'string, url of the file',
+                        generated_file_url: 'string, optional, url of the cover file',
+                        outpotPostItem: {
+                            text: 'string, caption text for the post'
+                        },
                     }
                 }],
                 additionalInputs: {
-
+                    generated_cover_file_url: 'string, url of the file',
+                    generated_file_url: 'string, optional, url of the cover file',
+                    outpotPostItem: {
+                        text: 'string, caption text for the post'
+                    },
                 },
             },
         };
@@ -71,6 +77,9 @@ export class PostToInstagram extends PipeTask<any, any> {
         let bot = this.bot
 
         let last = input.last
+        if (!last || last.length == 0) {
+            last = [input.additionalInputs as ScheduleModel]
+        }
         for (let model of last) {
             try {
 
@@ -80,7 +89,7 @@ export class PostToInstagram extends PipeTask<any, any> {
                     await bot.turnOnScreen()
                     this.onLog("Woke up device")
                 }
-                let payload = model.payload
+                let payload: ScheduleModelPayload = model.payload
                 if (typeof payload == 'string') {
                     payload = JSON.parse(payload)
                 }

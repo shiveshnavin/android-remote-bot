@@ -1,4 +1,4 @@
-import PipeLane, { PipeTask } from "pipelane";
+import PipeLane, { PipeTask, PipeTaskDescription } from "pipelane";
 export type ShellTaskAdditionalInput = {
     cmd: string;
 };
@@ -8,6 +8,7 @@ export declare class ShellTask extends PipeTask<any, any> {
     allowedCommands: any[];
     constructor(variantName?: string, allowedCommands?: string[]);
     kill(): boolean;
+    describe(): PipeTaskDescription | undefined;
     isExecutableAllowed(command: any, allowedExecutables: any): boolean;
     execute(pipeWorksInstance: PipeLane, input: {
         inputs: any[];

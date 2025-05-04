@@ -15,6 +15,17 @@ class DelayTask extends pipelane_1.PipeTask {
         }
         return true;
     }
+    describe() {
+        return {
+            summary: "Delays execution for the specified period",
+            inputs: {
+                additionalInputs: {
+                    milis: "number, the period to wait for in milis"
+                },
+                last: []
+            }
+        };
+    }
     async execute(pipeWorksInstance, input) {
         if (!input.additionalInputs.milis) {
             return [{

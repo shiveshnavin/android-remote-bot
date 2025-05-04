@@ -27,7 +27,9 @@ class LoopApiTask extends pipelane_1.PipeTask {
                     interval: "day | hour | min | sec"
                 },
                 last: [{
-                        url: "axios request config",
+                        url: "string, the url of the API",
+                        method: "string, Http method",
+                        headers: "object, an object of headers"
                     }]
             }
         };

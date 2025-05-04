@@ -14,6 +14,17 @@ class ShellTask extends pipelane_1.PipeTask {
     kill() {
         return true;
     }
+    describe() {
+        return {
+            summary: 'Task to execute shell commands',
+            inputs: {
+                last: [],
+                additionalInputs: {
+                    cmd: "string, the shell command to run"
+                }
+            }
+        };
+    }
     isExecutableAllowed(command, allowedExecutables) {
         if (allowedExecutables.includes("*"))
             return true;

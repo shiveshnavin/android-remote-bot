@@ -16,6 +16,19 @@ class ApiTask extends pipelane_1.PipeTask {
     kill() {
         return true;
     }
+    describe() {
+        return {
+            summary: "Call an API",
+            inputs: {
+                last: [],
+                additionalInputs: {
+                    url: "string, the url of the API",
+                    method: "string, Http method",
+                    headers: "object, an object of headers"
+                }
+            }
+        };
+    }
     async execute(pipeWorksInstance, input) {
         input = input.additionalInputs;
         if (!input.url) {

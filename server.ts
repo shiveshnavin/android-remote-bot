@@ -7,6 +7,7 @@ import { FetchSchedulesTask } from './tasks/FetchSchedulesTask'
 import { initRemoteCommand } from './remote-command'
 import { PostToInstagram } from './tasks/PostToInstagram'
 import { UpdateSchedulesTask } from './tasks/UpdateSchedulesTask'
+import { createMcpServer } from './pipelane-server/server/mcp'
 const app = express()
 const firebaseCreds = fs.readFileSync('firebase-creds.json').toString()
 const dbCreds = JSON.parse(firebaseCreds)
@@ -29,6 +30,7 @@ VariantConfig[FetchSchedulesTask.TASK_TYPE_NAME] = [new FetchSchedulesTask(db)]
 VariantConfig[UpdateSchedulesTask.TASK_TYPE_NAME] = [new UpdateSchedulesTask(db)]
 VariantConfig[PostToInstagram.TASK_TYPE_NAME] = [new PostToInstagram()]
 
+app.use(createMcpServer(VariantConfig, db))
 creatPipelaneServer(VariantConfig, db).then(pipelaneApp => {
     app.use('/pipelane', pipelaneApp)
     app.get('/**', (req, res, next) => {

@@ -64,6 +64,19 @@ class EvaluateJsTask extends pipelane_1.PipeTask {
     kill() {
         return true;
     }
+    describe() {
+        return {
+            summary: "Process JS. Must return in format [{status:true}]",
+            inputs: {
+                additionalInputs: {
+                    js: "string, The js code, for example: console.log(pl.inputs);\n//the last line of the must be an array in output\n[{status:true, ...other data}]"
+                },
+                last: [{
+                        status: true
+                    }]
+            }
+        };
+    }
     async evalInScope(js, pl, input, prev, axios, Utils = exports.EvalJSUtils) {
         return await eval(js);
     }
