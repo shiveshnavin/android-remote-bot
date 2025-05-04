@@ -89,7 +89,7 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 model.message = `Error processing schedule: ${error.message}`;
             }
         }
-        await bot.turnOffScreen();
+        // await bot.turnOffScreen()
         return last;
     }
     async wakeDevice() {

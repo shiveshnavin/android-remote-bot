@@ -100,7 +100,7 @@ async function igEnterCaptionAndPost(caption) {
     if (shareBtn)
         await bot.clickNode(shareBtn);
     console.log("Waiting for 20sec for Instagram to finish upload");
-    await bot.sleep(20000);
+    await bot.sleep(5000);
     // await bot.killApp("com.instagram.android");
 }
 async function shareAndPost() {

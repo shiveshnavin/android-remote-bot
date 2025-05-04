@@ -20,9 +20,7 @@ export type ScheduleModel = {
 
 interface PostToInstagramInputs {
     last: ScheduleModel[]
-    additionalInputs: {
-
-    };
+    additionalInputs: ScheduleModelPayload;
 }
 
 export class PostToInstagram extends PipeTask<any, any> {
@@ -125,7 +123,7 @@ export class PostToInstagram extends PipeTask<any, any> {
                 model.message = `Error processing schedule: ${error.message}`
             }
         }
-        await bot.turnOffScreen()
+        // await bot.turnOffScreen()
 
         return last
     }
