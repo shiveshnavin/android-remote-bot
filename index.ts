@@ -100,6 +100,7 @@ export async function switchProfile(newUserName: string) {
   let screenJson = await bot.dumpScreenXml()
   let profileBtn = await bot.findElementByAttribute("resource-id", "com.instagram.android:id/profile_tab", screenJson)
   await bot.clickAndHoldNode(profileBtn, 2000)
+  screenJson = await bot.dumpScreenXml()
   let userBtn = await bot.findElementByAttribute("text", newUserName.trim(), screenJson)
   if (userBtn) {
     await bot.clickNode(userBtn)
