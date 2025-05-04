@@ -118,30 +118,53 @@ export class AndroidBot {
     const command = `adb shell input keyevent ${keyEvents}`;
     await this.executeCommand(command);
   }
-
-  // Type text into the device's input field
   async typeText(text: string): Promise<string> {
     try {
-      // Split the text into parts, preserving \n and \t markers
-      const parts = text.split(/(\n|\t)/);
+      const parts = text.split(/(\n|\t|\[|\]|\{|\}|\(|\)| )/);
       let result = '';
 
       for (const part of parts) {
-        if (part === '\n') {
-          result += await this.executeCommand(`adb shell input keyevent 66`); // Enter key
+        if (part === '') {
+          continue;
+        } else if (part === '\n') {
+          result += await this.executeCommand(`adb shell input keyevent 66`); // KEYCODE_ENTER
         } else if (part === '\t') {
-          result += await this.executeCommand(`adb shell input keyevent 61`); // Tab key
-        } else if (part.length > 0) {
+          result += await this.executeCommand(`adb shell input keyevent 61`); // KEYCODE_TAB
+        } else if (part === '[') {
+          // Handle left bracket character
+          result += await this.executeCommand(`adb shell input keyevent 71`); // KEYCODE_LEFT_BRACKET
+        } else if (part === ']') {
+          // Handle right bracket character
+          result += await this.executeCommand(`adb shell input keyevent 72`); // KEYCODE_RIGHT_BRACKET
+        } else if (part === '{') {
+          // Handle left brace character
+          result += await this.executeCommand(`adb shell input keyevent 73`); // KEYCODE_LEFT_BRACE
+        } else if (part === '}') {
+          // Handle right brace character
+          result += await this.executeCommand(`adb shell input keyevent 74`); // KEYCODE_RIGHT_BRACE
+        } else if (part === '(') {
+          // Handle left parenthesis character
+          result += await this.executeCommand(`adb shell input keyevent 75`); // KEYCODE_LEFT_PARENTHESIS
+        } else if (part === ')') {
+          // Handle right parenthesis character
+          result += await this.executeCommand(`adb shell input keyevent 76`); // KEYCODE_RIGHT_PARENTHESIS
+        } else if (part === ' ') {
+          // Handle space character using keyevent (replacing the old %s logic)
+          result += await this.executeCommand(`adb shell input keyevent 62`); // KEYCODE_SPACE
+        }
+        else {
           const safeText = part
-            .replace(/ /g, "%s") // Replace spaces with %s
-            .replace(/(["\\$`])/g, "\\$1"); // Escape problematic characters
-          const command = `adb shell input text "${safeText}"`;
-          result += await this.executeCommand(command);
+            .replace(/(["\\$`])/g, "\\$1");
+          if (safeText.length > 0) {
+            const command = `adb shell input text "${safeText}"`;
+            result += await this.executeCommand(command);
+          }
         }
       }
 
-      console.log(`Typed text: ${text}`);
+      console.log(`Finished typing text: "${text}"`); // Log the original text
       return result;
+
     } catch (error) {
       console.error(`Failed to type text "${text}":`, error);
       throw error;
