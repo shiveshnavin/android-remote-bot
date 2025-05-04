@@ -78,7 +78,9 @@ export class PostToInstagram extends PipeTask<any, any> {
 
         let last = input.last
         if (!last || last.length == 0) {
-            last = [input.additionalInputs as ScheduleModel]
+            last = [{
+                payload: input.additionalInputs as any
+            } as any]
         }
         for (let model of last) {
             try {
