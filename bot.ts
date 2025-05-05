@@ -201,6 +201,9 @@ export class AndroidBot {
       console.log("Found node", label);
       return node;
     }
+    else {
+      console.error("Node not Found ", label);
+    }
   }
 
   async clickAndHoldNode(node: any, durationMs: number) {
@@ -217,6 +220,7 @@ export class AndroidBot {
       await this.clickAt(bounds.x, bounds.y);
     } catch (e) {
       e.message = 'Error clicking ' + node + ' : ' + e.message
+      throw e
     }
   }
 

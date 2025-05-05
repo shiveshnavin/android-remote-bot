@@ -195,6 +195,9 @@ class AndroidBot {
             console.log("Found node", label);
             return node;
         }
+        else {
+            console.error("Node not Found ", label);
+        }
     }
     async clickAndHoldNode(node, durationMs) {
         const xml = new xml_1.XmlUtils();
@@ -203,8 +206,15 @@ class AndroidBot {
     }
     async clickNode(node) {
         const xml = new xml_1.XmlUtils();
+        console.log('clicing node ', node);
         const bounds = xml.getBounds(node);
-        await this.clickAt(bounds.x, bounds.y);
+        try {
+            await this.clickAt(bounds.x, bounds.y);
+        }
+        catch (e) {
+            e.message = 'Error clicking ' + node + ' : ' + e.message;
+            throw e;
+        }
     }
     async clickAndHold(x, y, durationMs) {
         try {
