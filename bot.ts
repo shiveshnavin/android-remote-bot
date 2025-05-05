@@ -211,8 +211,13 @@ export class AndroidBot {
 
   async clickNode(node: any): Promise<void> {
     const xml = new XmlUtils();
+    console.log('clicing node ', node)
     const bounds = xml.getBounds(node) as any;
-    await this.clickAt(bounds.x, bounds.y);
+    try {
+      await this.clickAt(bounds.x, bounds.y);
+    } catch (e) {
+      e.message = 'Error clicking ' + node + ' : ' + e.message
+    }
   }
 
   async clickAndHold(x: number, y: number, durationMs: number): Promise<any> {
