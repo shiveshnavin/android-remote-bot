@@ -85,7 +85,7 @@ export async function igEnterCaptionAndPost(caption: string): Promise<void> {
   // let moreOptions = await bot.findElementByLabel("Save Draft", screenJson);
   if (moreOptions) await bot.clickNode(moreOptions);
   if (shareBtn) await bot.clickNode(shareBtn);
-  console.log("Waiting for 20sec for Instagram to finish upload");
+  console.log("Waiting for 5sec for Instagram to finish upload");
   await bot.sleep(5000);
   await bot.pressBackKey(5)
 }
