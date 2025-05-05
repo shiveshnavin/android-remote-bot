@@ -102,7 +102,7 @@ async function igEnterCaptionAndPost(caption) {
         await bot.clickNode(shareBtn);
     console.log("Waiting for 20sec for Instagram to finish upload");
     await bot.sleep(5000);
-    // await bot.killApp("com.instagram.android");
+    await bot.pressBackKey(5);
 }
 async function shareAndPost() {
     const filePath = "/storage/emulated/0/Download/ttxx.mp4";
