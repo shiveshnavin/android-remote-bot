@@ -55,12 +55,14 @@ export async function shareFile(filePath: string, activity: string): Promise<voi
 
 export async function igGoNextShare(): Promise<void> {
   let screenJson = await bot.dumpScreenXml();
+  await bot.dismissBottomSheetIfPresent(screenJson)
   let nextBtn = await bot.findElementByLabel("Next", screenJson);
   await bot.clickNode(nextBtn);
 }
 
 export async function igEnterCaptionAndPost(caption: string): Promise<void> {
   let screenJson = await bot.dumpScreenXml();
+  await bot.dismissBottomSheetIfPresent(screenJson)
   let captionInput = await bot.findElementByAttribute(
     "resource-id",
     "com.instagram.android:id/caption_input_text_view",

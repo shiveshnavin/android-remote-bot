@@ -1,6 +1,22 @@
-interface Node {
+export interface Node {
     $?: {
-        [key: string]: string;
+        index: string;
+        text: string;
+        'resource-id': string;
+        class: string;
+        package: string;
+        'content-desc': string;
+        checkable: string;
+        checked: string;
+        clickable: string;
+        enabled: string;
+        focusable: string;
+        focused: string;
+        scrollable: string;
+        'long-clickable': string;
+        password: string;
+        selected: string;
+        bounds: string;
     };
     node?: Node[];
 }

@@ -1,7 +1,7 @@
 import { exec } from "child_process";
 import fs from "fs";
 import path from "path";
-import { XmlUtils } from "./xml";
+import { Node, XmlUtils } from "./xml";
 
 console.log("Android BOT");
 
@@ -9,6 +9,7 @@ let wsdir = "./workspace";
 if (!fs.existsSync(wsdir)) {
   fs.mkdirSync(wsdir);
 }
+
 
 export class AndroidBot {
   // Method to kill app by package name
@@ -112,6 +113,37 @@ export class AndroidBot {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
+  async dismissBottomSheetIfPresent(screenJson) {
+    try {
+      let sheet = await this.findElementByAttribute('resource-id', "com.instagram.android:id/layout_container_bottom_sheet", screenJson)
+      if (sheet) {
+        console.log('Found bottom sheet, dismissing')
+        await this.clickAtTopCenter()
+      }
+    } catch (e) {
+      console.log("Tolerable error dismissing bottomsheet")
+    }
+  }
+  async clickAtTopCenter(): Promise<void> {
+    // Get screen size (width x height)
+    const sizeOutput = await this.executeCommand(`adb shell wm size`);
+    const match = sizeOutput.match(/Physical size:\s*(\d+)x(\d+)/);
+    if (!match) throw new Error("Unable to determine screen size");
+
+    // Parse width and height
+    const width = parseInt(match[1], 10);
+    const height = parseInt(match[2], 10);
+
+    // Calculate the coordinates
+    const x = Math.floor(width / 2); // Center of width
+    const y = Math.floor(height * 0.1); // 10% of the height
+
+    // Run the ADB tap command
+    const command = `adb shell input tap ${x} ${y}`;
+    await this.executeCommand(command);
+  }
+
+
   // Clear input field by simulating backspace key presses
   async clearInputField(strokes: number): Promise<void> {
     const keyEvents = Array(strokes).fill("67").join(" ");
@@ -176,7 +208,7 @@ export class AndroidBot {
     attr: string,
     value: string,
     screenJson?: any
-  ): Promise<any> {
+  ): Promise<Node> {
     const xml = new XmlUtils();
     if (!screenJson) {
       screenJson = await this.dumpScreenXml();
@@ -190,7 +222,7 @@ export class AndroidBot {
   }
 
   // Find element by label
-  async findElementByLabel(label: string, screenJson?: any): Promise<any> {
+  async findElementByLabel(label: string, screenJson?: any): Promise<Node> {
     const xml = new XmlUtils();
     if (!screenJson) {
       screenJson = await this.dumpScreenXml();
@@ -206,20 +238,21 @@ export class AndroidBot {
     }
   }
 
-  async clickAndHoldNode(node: any, durationMs: number) {
+  async clickAndHoldNode(node: Node, durationMs: number) {
     const xml = new XmlUtils();
     const bounds = xml.getBounds(node) as any;
     await this.clickAndHold(bounds.x, bounds.y, durationMs);
   }
 
-  async clickNode(node: any): Promise<void> {
+  async clickNode(node: Node): Promise<void> {
     const xml = new XmlUtils();
-    console.log('clicing node ', node)
+    let nodeName = node.$?.text || node.$?.["content-desc"] || node.$?.["resource-id"]
+    console.log('clicing node ', nodeName)
     const bounds = xml.getBounds(node) as any;
     try {
       await this.clickAt(bounds.x, bounds.y);
     } catch (e) {
-      e.message = 'Error clicking ' + node + ' : ' + e.message
+      e.message = 'Error clicking ' + nodeName + ' : ' + e.message
       throw e
     }
   }
@@ -240,7 +273,7 @@ export class AndroidBot {
     try {
       const command = `adb shell input tap ${x} ${y}`;
       const result = await this.executeCommand(command);
-      console.log(`Clicked at coordinates: x=${x}, y=${y}`);
+      // console.log(`Clicked at coordinates: x=${x}, y=${y}`);
       return result;
     } catch (error) {
       console.error(`Failed to click at coordinates x=${x}, y=${y}:`, error);

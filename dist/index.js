@@ -79,11 +79,13 @@ async function shareFile(filePath, activity) {
 }
 async function igGoNextShare() {
     let screenJson = await bot.dumpScreenXml();
+    await bot.dismissBottomSheetIfPresent(screenJson);
     let nextBtn = await bot.findElementByLabel("Next", screenJson);
     await bot.clickNode(nextBtn);
 }
 async function igEnterCaptionAndPost(caption) {
     let screenJson = await bot.dumpScreenXml();
+    await bot.dismissBottomSheetIfPresent(screenJson);
     let captionInput = await bot.findElementByAttribute("resource-id", "com.instagram.android:id/caption_input_text_view", screenJson);
     await bot.clickNode(captionInput);
     await bot.clearInputField(10);
