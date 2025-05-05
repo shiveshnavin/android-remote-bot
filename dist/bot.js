@@ -286,9 +286,9 @@ class AndroidBot {
                 if (error) {
                     return reject(new Error(`Command failed: ${error.message}`));
                 }
-                if (stderr) {
-                    return reject(new Error(`stderr: ${stderr}`));
-                }
+                // if (stderr) {
+                //   return reject(new Error(`stderr: ${stderr}`));
+                // }
                 resolve(stdout.trim()); // Resolve with the standard output
             });
         });
