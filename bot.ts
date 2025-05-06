@@ -15,7 +15,7 @@ export class AndroidBot {
 
 
   async setVolumeToZero() {
-    let cmd = `adb shell input keyevent 25 25 25 25 25 25 25 25 25 25 25 25`
+    let cmd = `adb shell input keyevent 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25`
     await this.executeCommand(cmd)
   }
 

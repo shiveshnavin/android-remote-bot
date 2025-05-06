@@ -136,8 +136,6 @@ export class PostToInstagram extends PipeTask<any, any> {
                 this.onLog(`Error processing schedule: ${error.message}`);
                 model.status = false
                 model.message = `Error processing schedule: ${error.message}`
-            } finally {
-                await bot.setVolumeToMax()
             }
         }
         // await bot.turnOffScreen()

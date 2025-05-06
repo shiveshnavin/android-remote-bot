@@ -106,9 +106,6 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 model.status = false;
                 model.message = `Error processing schedule: ${error.message}`;
             }
-            finally {
-                await bot.setVolumeToMax();
-            }
         }
         // await bot.turnOffScreen()
         return last;
