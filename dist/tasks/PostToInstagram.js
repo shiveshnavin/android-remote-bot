@@ -85,6 +85,7 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 this.onLog(fileName, 'downloading to', targetFile);
                 this.onLog('Posting start: ', caption);
                 await (bot.executeCommand(downloadCmd).catch(e => { }));
+                await bot.setVolumeToZero();
                 await bot.pressBackKey(5);
                 if (model.tenant) {
                     await bot.openActivity("com.instagram.android/com.instagram.android.activity.MainTabActivity");
@@ -104,6 +105,9 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 this.onLog(`Error processing schedule: ${error.message}`);
                 model.status = false;
                 model.message = `Error processing schedule: ${error.message}`;
+            }
+            finally {
+                await bot.setVolumeToMax();
             }
         }
         // await bot.turnOffScreen()

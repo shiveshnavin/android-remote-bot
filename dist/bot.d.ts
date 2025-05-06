@@ -1,5 +1,7 @@
 import { Node } from "./xml";
 export declare class AndroidBot {
+    setVolumeToZero(): Promise<void>;
+    setVolumeToMax(): Promise<void>;
     killApp(pkg: string): Promise<void>;
     hideKeyboardIfVisible(): Promise<void>;
     isKeyboardVisible(): Promise<boolean>;

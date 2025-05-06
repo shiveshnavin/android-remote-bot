@@ -14,6 +14,14 @@ if (!fs_1.default.existsSync(wsdir)) {
     fs_1.default.mkdirSync(wsdir);
 }
 class AndroidBot {
+    async setVolumeToZero() {
+        let cmd = `adb shell input keyevent 25 25 25 25 25 25 25 25 25 25 25 25`;
+        await this.executeCommand(cmd);
+    }
+    async setVolumeToMax() {
+        let cmd = `adb shell input keyevent 24 24 24 24 24 24 24 24 24 24 24 24`;
+        await this.executeCommand(cmd);
+    }
     // Method to kill app by package name
     async killApp(pkg) {
         await this.executeCommand(`adb shell am force-stop ${pkg}`);

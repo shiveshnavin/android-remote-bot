@@ -12,6 +12,18 @@ if (!fs.existsSync(wsdir)) {
 
 
 export class AndroidBot {
+
+
+  async setVolumeToZero() {
+    let cmd = `adb shell input keyevent 25 25 25 25 25 25 25 25 25 25 25 25`
+    await this.executeCommand(cmd)
+  }
+
+
+  async setVolumeToMax() {
+    let cmd = `adb shell input keyevent 24 24 24 24 24 24 24 24 24 24 24 24`
+    await this.executeCommand(cmd)
+  }
   // Method to kill app by package name
   async killApp(pkg: string): Promise<void> {
     await this.executeCommand(`adb shell am force-stop ${pkg}`);
@@ -353,6 +365,7 @@ export class AndroidBot {
       });
     });
   }
+
 }
 
 const bot = new AndroidBot();
