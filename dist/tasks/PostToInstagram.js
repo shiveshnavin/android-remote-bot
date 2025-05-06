@@ -1,9 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostToInstagram = void 0;
 const pipelane_1 = require("pipelane");
 const bot_1 = require("../bot");
 const __1 = require("..");
+const axios_1 = __importDefault(require("axios"));
 class PostToInstagram extends pipelane_1.PipeTask {
     static TASK_VARIANT_NAME = 'instagram-bot';
     static TASK_TYPE_NAME = 'android-bot';
@@ -99,6 +103,9 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 await (0, __1.igEnterCaptionAndPost)(caption);
                 model.status = true;
                 model.message = `Posted successfully!`;
+                await axios_1.default.delete(url).catch(e => {
+                    console.log('tolerable error deleting', fileName);
+                });
             }
             catch (error) {
                 await bot.pressBackKey(5);

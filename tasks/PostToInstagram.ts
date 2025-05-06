@@ -2,6 +2,7 @@ import PipeLane, { PipeTask, PipeTaskDescription } from 'pipelane';
 import { ErrorOutput } from '../pipelane-server/server/pipe-tasks';
 import { AndroidBot } from '../bot';
 import { igEnterCaptionAndPost, igGoNextShare, shareFile, switchProfile } from '..';
+import axios from 'axios';
 export type ScheduleModelPayload = {
     generated_cover_file_url: string;
     generated_file_url: string;
@@ -131,6 +132,10 @@ export class PostToInstagram extends PipeTask<any, any> {
                 await igEnterCaptionAndPost(caption)
                 model.status = true
                 model.message = `Posted successfully!`
+
+                await axios.delete(url).catch(e => {
+                    console.log('tolerable error deleting', fileName)
+                })
             } catch (error) {
                 await bot.pressBackKey(5)
                 this.onLog(`Error processing schedule: ${error.message}`);
