@@ -235,7 +235,7 @@ class AndroidBot {
     async clickNode(node) {
         const xml = new xml_1.XmlUtils();
         let nodeName = node.$?.text || node.$?.["content-desc"] || node.$?.["resource-id"];
-        console.log('clicing node ', nodeName);
+        console.log('clicking node ', nodeName);
         const bounds = xml.getBounds(node);
         try {
             await this.clickAt(bounds.x, bounds.y);

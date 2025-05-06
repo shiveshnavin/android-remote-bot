@@ -67,6 +67,9 @@ class XmlUtils {
         const root = this.xmlJson.hierarchy.node;
         // Recursive function to search through the XML
         const searchNode = (node) => {
+            if (!node) {
+                return null;
+            }
             // Check if the 'text' attribute matches the label
             if (node.$ && node.$.text && node.$.text.includes(label)) {
                 return node;
@@ -88,6 +91,7 @@ class XmlUtils {
                 return result;
             }
         }
+        console.log('Node not found', `${label}`);
         return null;
     }
     // Find the node with the given attribute and value
@@ -100,6 +104,9 @@ class XmlUtils {
         const root = this.xmlJson.hierarchy.node;
         // Recursive function to search through the XML
         const searchNode = (node) => {
+            if (!node) {
+                return null;
+            }
             // Check if the attribute matches the target value
             if (node.$ && node.$[attr] && node.$[attr].includes(attrValue)) {
                 return node;
@@ -121,6 +128,7 @@ class XmlUtils {
                 return result;
             }
         }
+        console.log('Node not found', `${attr} = ${attrValue}`);
         return null;
     }
     // Get bounds of the node and return the center coordinates
