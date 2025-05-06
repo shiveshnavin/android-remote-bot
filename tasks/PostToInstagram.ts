@@ -136,10 +136,10 @@ export class PostToInstagram extends PipeTask<any, any> {
 
                 if (coverUrl)
                     await axios.delete(coverUrl).catch(e => {
-                        console.log('tolerable error deleting cover for ', fileName)
+                        console.log('tolerable error deleting cover for ', fileName, e.message)
                     })
                 await axios.delete(url).catch(e => {
-                    console.log('tolerable error deleting', fileName)
+                    console.log('tolerable error deleting', fileName, e.message)
                 })
             } catch (error) {
                 await bot.pressBackKey(5)
