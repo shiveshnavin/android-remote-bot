@@ -76,6 +76,7 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 }
                 let caption = outpotPostItem.text;
                 let url = payload.generated_file_url;
+                let coverUrl = payload.generated_cover_file_url;
                 if (this.posted.includes(url)) {
                     model.status = true;
                     model.message = `Posted successfully!`;
@@ -103,6 +104,10 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 await (0, __1.igEnterCaptionAndPost)(caption);
                 model.status = true;
                 model.message = `Posted successfully!`;
+                if (coverUrl)
+                    await axios_1.default.delete(coverUrl).catch(e => {
+                        console.log('tolerable error deleting cover for ', fileName);
+                    });
                 await axios_1.default.delete(url).catch(e => {
                     console.log('tolerable error deleting', fileName);
                 });

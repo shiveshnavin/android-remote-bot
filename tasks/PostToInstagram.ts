@@ -104,6 +104,7 @@ export class PostToInstagram extends PipeTask<any, any> {
 
                 let caption = outpotPostItem.text
                 let url = payload.generated_file_url
+                let coverUrl = payload.generated_cover_file_url
                 if (this.posted.includes(url)) {
                     model.status = true
                     model.message = `Posted successfully!`
@@ -133,6 +134,10 @@ export class PostToInstagram extends PipeTask<any, any> {
                 model.status = true
                 model.message = `Posted successfully!`
 
+                if (coverUrl)
+                    await axios.delete(coverUrl).catch(e => {
+                        console.log('tolerable error deleting cover for ', fileName)
+                    })
                 await axios.delete(url).catch(e => {
                     console.log('tolerable error deleting', fileName)
                 })
