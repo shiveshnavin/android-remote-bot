@@ -59,6 +59,9 @@ class XmlUtils {
 
     // Recursive function to search through the XML
     const searchNode = (node: Node): Node | null => {
+      if (!node) {
+        return null
+      }
       // Check if the 'text' attribute matches the label
       if (node.$ && node.$.text && node.$.text.includes(label)) {
         return node;
@@ -81,6 +84,8 @@ class XmlUtils {
         return result;
       }
     }
+    console.log('Node not found', `${label}`)
+
     return null;
   }
 
@@ -96,6 +101,9 @@ class XmlUtils {
 
     // Recursive function to search through the XML
     const searchNode = (node: Node): Node | null => {
+      if (!node) {
+        return null
+      }
       // Check if the attribute matches the target value
       if (node.$ && node.$[attr] && node.$[attr].includes(attrValue)) {
         return node;
@@ -119,7 +127,7 @@ class XmlUtils {
         return result;
       }
     }
-
+    console.log('Node not found', `${attr} = ${attrValue}`)
     return null;
   }
 

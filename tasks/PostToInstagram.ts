@@ -120,14 +120,18 @@ export class PostToInstagram extends PipeTask<any, any> {
                 await bot.pressBackKey(5)
                 if (model.tenant) {
                     await bot.openActivity("com.instagram.android/com.instagram.android.activity.MainTabActivity")
+                    await bot.sleep(5000)
                     await switchProfile(model.tenant)
                 }
                 await shareFile(targetFile, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity")
+                await bot.sleep(5000)
                 await igGoNextShare()
+                await bot.sleep(2000)
                 await igEnterCaptionAndPost(caption)
                 model.status = true
                 model.message = `Posted successfully!`
             } catch (error) {
+                await bot.pressBackKey(5)
                 this.onLog(`Error processing schedule: ${error.message}`);
                 model.status = false
                 model.message = `Error processing schedule: ${error.message}`
