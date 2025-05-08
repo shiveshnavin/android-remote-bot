@@ -66,5 +66,14 @@ class RemoteCommandListerTask extends pipelane_1.PipeTask {
         initRemoteCommand(this.db);
         return [{ status: true }];
     }
+    describe() {
+        return {
+            summary: 'Restarts the remote task listener',
+            inputs: {
+                last: [],
+                additionalInputs: {}
+            }
+        };
+    }
 }
 exports.RemoteCommandListerTask = RemoteCommandListerTask;

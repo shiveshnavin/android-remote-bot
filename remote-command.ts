@@ -1,7 +1,7 @@
 import { FireStoreDB, MultiDbORM } from "multi-db-orm";
 import { AndroidBot } from "./bot";
 import { Firestore } from "firebase-admin/firestore";
-import { PipeTask } from "pipelane";
+import { PipeTask, PipeTaskDescription } from "pipelane";
 
 const bot = new AndroidBot()
 
@@ -78,5 +78,15 @@ export class RemoteCommandListerTask extends PipeTask<any, any> {
     async execute() {
         initRemoteCommand(this.db)
         return [{ status: true }]
+    }
+
+    describe(): PipeTaskDescription | undefined {
+        return {
+            summary: 'Restarts the remote task listener',
+            inputs: {
+                last: [],
+                additionalInputs: {}
+            }
+        }
     }
 }

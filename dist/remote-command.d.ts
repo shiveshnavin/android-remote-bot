@@ -1,5 +1,5 @@
 import { FireStoreDB } from "multi-db-orm";
-import { PipeTask } from "pipelane";
+import { PipeTask, PipeTaskDescription } from "pipelane";
 export type RemoteCommand = {
     cmd: string;
     startTime: string;
@@ -15,4 +15,5 @@ export declare class RemoteCommandListerTask extends PipeTask<any, any> {
     execute(): Promise<{
         status: boolean;
     }[]>;
+    describe(): PipeTaskDescription | undefined;
 }
