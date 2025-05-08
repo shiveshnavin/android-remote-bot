@@ -72,7 +72,7 @@ export async function igEnterCaptionAndPost(caption: string): Promise<void> {
   await bot.clearInputField(10);
   await bot.sleep(1000);
   await bot.typeText(caption);
-  await bot.sleep(1000);
+  await bot.sleep(3000);
   await bot.hideKeyboardIfVisible();
   await bot.sleep(2000);
   screenJson = await bot.dumpScreenXml();
