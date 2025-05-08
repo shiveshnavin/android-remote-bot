@@ -175,7 +175,7 @@ export class AndroidBot {
         } else if (part === '\t') {
           result += await this.executeCommand(`adb shell input keyevent 61`); // KEYCODE_TAB
         } else if (part === '#') {
-          result += await this.executeCommand(`adb shell 'input text "\\#"'`);
+          result += await this.executeCommand(`adb shell 'input text "#"'`);
         } else if (part === '[') {
           // Handle left bracket character
           result += await this.executeCommand(`adb shell input keyevent 71`); // KEYCODE_LEFT_BRACKET
