@@ -28,6 +28,7 @@ app.use('/bot', (req, res) => {
 pipe_tasks_1.VariantConfig[FetchSchedulesTask_1.FetchSchedulesTask.TASK_TYPE_NAME] = [new FetchSchedulesTask_1.FetchSchedulesTask(db)];
 pipe_tasks_1.VariantConfig[UpdateSchedulesTask_1.UpdateSchedulesTask.TASK_TYPE_NAME] = [new UpdateSchedulesTask_1.UpdateSchedulesTask(db)];
 pipe_tasks_1.VariantConfig[PostToInstagram_1.PostToInstagram.TASK_TYPE_NAME] = [new PostToInstagram_1.PostToInstagram()];
+pipe_tasks_1.VariantConfig['restart-remote-command'] = [new remote_command_1.RemoteCommandListerTask(db)];
 app.use((0, mcp_1.createMcpServer)(pipe_tasks_1.VariantConfig, db));
 (0, pipelane_server_1.creatPipelaneServer)(pipe_tasks_1.VariantConfig, db).then(pipelaneApp => {
     app.use('/pipelane', pipelaneApp);

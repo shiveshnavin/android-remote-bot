@@ -1,12 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.RemoteCommandListerTask = void 0;
 exports.initRemoteCommand = initRemoteCommand;
 const bot_1 = require("./bot");
+const pipelane_1 = require("pipelane");
 const bot = new bot_1.AndroidBot();
+let listener = undefined;
 function initRemoteCommand(db) {
     let collection = 'android_bot_remote_cmd';
     const firestoreDb = db.db;
-    firestoreDb.collection(collection).onSnapshot(snapshot => {
+    if (listener) {
+        try {
+            listener.remove();
+        }
+        catch (e) { }
+    }
+    listener = firestoreDb.collection(collection).onSnapshot(snapshot => {
         snapshot.docChanges().forEach(change => {
             if (change.type === 'added' || change.type === 'modified') {
                 const commandData = change.doc.data();
@@ -44,3 +53,18 @@ function initRemoteCommand(db) {
     });
     console.log(`remote-cmd: Listening for remote commands on collection: ${collection}`);
 }
+class RemoteCommandListerTask extends pipelane_1.PipeTask {
+    db;
+    constructor(db) {
+        super('restart-remote-command', 'restart-remote-command');
+        this.db = db;
+    }
+    kill() {
+        return true;
+    }
+    async execute() {
+        initRemoteCommand(this.db);
+        return [{ status: true }];
+    }
+}
+exports.RemoteCommandListerTask = RemoteCommandListerTask;

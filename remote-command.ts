@@ -1,5 +1,7 @@
 import { FireStoreDB, MultiDbORM } from "multi-db-orm";
 import { AndroidBot } from "./bot";
+import { Firestore } from "firebase-admin/firestore";
+import { PipeTask } from "pipelane";
 
 const bot = new AndroidBot()
 
@@ -11,12 +13,16 @@ export type RemoteCommand = {
     output: string
 }
 
-
+let listener = undefined
 export function initRemoteCommand(db: FireStoreDB) {
     let collection = 'android_bot_remote_cmd';
-    const firestoreDb = db.db
-
-    firestoreDb.collection(collection).onSnapshot(snapshot => {
+    const firestoreDb = db.db as Firestore
+    if (listener) {
+        try {
+            listener.remove()
+        } catch (e) { }
+    }
+    listener = firestoreDb.collection(collection).onSnapshot(snapshot => {
         snapshot.docChanges().forEach(change => {
             if (change.type === 'added' || change.type === 'modified') {
                 const commandData = change.doc.data() as RemoteCommand;
@@ -55,4 +61,22 @@ export function initRemoteCommand(db: FireStoreDB) {
     });
 
     console.log(`remote-cmd: Listening for remote commands on collection: ${collection}`);
+}
+
+
+
+export class RemoteCommandListerTask extends PipeTask<any, any> {
+
+    db: FireStoreDB
+    constructor(db: FireStoreDB) {
+        super('restart-remote-command', 'restart-remote-command')
+        this.db = db
+    }
+    kill(): boolean {
+        return true
+    }
+    async execute() {
+        initRemoteCommand(this.db)
+        return [{ status: true }]
+    }
 }
