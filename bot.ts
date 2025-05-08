@@ -198,7 +198,7 @@ export class AndroidBot {
         }
         else {
           const safeText = part
-            .replace(/(["\\$`])/g, "\\$1");
+            .replace(/(["\\$`])/g, "\\$1").replace(/['"`]/g, '');
           if (safeText.length > 0) {
             const command = `adb shell input text "${safeText}"`;
             result += await this.executeCommand(command);
