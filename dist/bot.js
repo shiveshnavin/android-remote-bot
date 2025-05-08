@@ -33,7 +33,10 @@ class AndroidBot {
             const keyboardVisible = await this.isKeyboardVisible();
             if (keyboardVisible) {
                 console.log("Keyboard is visible, pressing back button...");
-                await this.executeCommand("adb shell input keyevent KEYCODE_BACK");
+                await this.executeCommand("adb shell input keyevent 111");
+                if (await this.isKeyboardVisible()) {
+                    await this.executeCommand("adb shell input keyevent KEYCODE_BACK");
+                }
             }
             else {
                 console.log("Keyboard is not visible.");
