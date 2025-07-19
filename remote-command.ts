@@ -16,13 +16,16 @@ export type RemoteCommand = {
 let listener = undefined
 export function initRemoteCommand(db: FireStoreDB) {
     let collection = 'android_bot_remote_cmd';
+    const deviceId = process.env.DEVICE_ID || 'default_device';
     const firestoreDb = db.db as Firestore
     if (listener) {
         try {
             listener.remove()
         } catch (e) { }
     }
-    listener = firestoreDb.collection(collection).onSnapshot(snapshot => {
+    listener = firestoreDb.collection(collection)
+        .where('deviceId', '==', deviceId)
+        .onSnapshot(snapshot => {
         snapshot.docChanges().forEach(change => {
             if (change.type === 'added' || change.type === 'modified') {
                 const commandData = change.doc.data() as RemoteCommand;
