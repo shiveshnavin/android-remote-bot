@@ -143,6 +143,7 @@ export class PostToInstagram extends PipeTask<any, any> {
                 })
             } catch (error) {
                 await bot.pressBackKey(5)
+                console.log("Error processing schedule:", error);
                 this.onLog(`Error processing schedule: ${error.message}`);
                 model.status = false
                 model.message = `Error processing schedule: ${error.message}`
