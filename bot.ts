@@ -233,7 +233,7 @@ export class AndroidBot {
     xml.xmlJson = screenJson;
     const node = await xml.findNodeByAttr(attr, value);
     if (node) {
-      console.log("Found node", `${attr}=${value}`);
+      console.log("Found node", `${attr}=${value}`, '@', node.$.bounds);
       return node;
     }
   }
@@ -247,7 +247,7 @@ export class AndroidBot {
     xml.xmlJson = screenJson;
     const node = await xml.findNodeByLabel(label);
     if (node) {
-      console.log("Found node", label);
+      console.log("Found node", label, '@', node.$.bounds);
       return node;
     }
     else {
