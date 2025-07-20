@@ -80,7 +80,7 @@ async function shareFile(filePath, activity) {
 async function igGoNextShare() {
     let screenJson = await bot.dumpScreenXml();
     await bot.dismissBottomSheetIfPresent(screenJson);
-    let nextBtn = await bot.findElementByLabel("Next", screenJson);
+    let nextBtn = await bot.findElementByAttribute("content-desc", "Next", screenJson);
     await bot.clickNode(nextBtn);
 }
 async function igEnterCaptionAndPost(caption) {
