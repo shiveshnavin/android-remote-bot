@@ -83,7 +83,7 @@ class PostToInstagram extends pipelane_1.PipeTask {
                     continue;
                 }
                 this.posted.push(url);
-                let fileName = getFilenameFromUrl(url);
+                let fileName = Date.now() + "_" + getFilenameFromUrl(url)
                 let downloadDir = '/sdcard/Download';
                 let targetFile = downloadDir + "/" + fileName;
                 let downloadCmd = `wget -q -O ${targetFile} ${url}  > /dev/null 2>&1`;
