@@ -17,12 +17,7 @@ class AndroidBot {
 
     async connectToDevice() {
         try {
-            const adbd = `
-      su
-      setprop service.adb.tcp.port 5555
-      stop adbd
-      start adbd
-      `;
+            const adbd = `su -c "setprop service.adb.tcp.port 5555; stop adbd;start adbd;`
             await this.executeCommand(adbd);
             const command = `adb connect 127.0.0.1:5555`;
             await this.executeCommand(command);
