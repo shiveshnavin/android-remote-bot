@@ -14,6 +14,24 @@ if (!fs.existsSync(wsdir)) {
 export class AndroidBot {
 
 
+  async connectToDevice(): Promise<void> {
+    try {
+      const adbd = `
+      su
+      setprop service.adb.tcp.port 5555
+      stop adbd
+      start adbd
+      `;
+      await this.executeCommand(adbd);
+      const command = `adb connect 127.0.0.1:5555`;
+      await this.executeCommand(command);
+      console.log("Connected to device at 5555")
+    } catch (error) {
+      console.error("Failed to connect to device:", error);
+      throw error;
+    }
+  }
+
   async setVolumeToZero() {
     let cmd = `adb shell input keyevent 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25`
     await this.executeCommand(cmd)

@@ -27,4 +27,5 @@ export declare class AndroidBot {
     turnOffScreen(): Promise<void>;
     isScreenOn(): Promise<boolean>;
     executeCommand(command: string): Promise<string>;
+    connectToDevice(): Promise<void>;
 }
