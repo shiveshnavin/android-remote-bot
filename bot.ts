@@ -44,18 +44,18 @@ export class AndroidBot {
   }
 
   // Method to hide keyboard if it's visible
-  async hideKeyboardIfVisible(): Promise<void> {
+  async hideKeyboardIfVisible(tryHideKeyboardTries = 0): Promise<void> {
     try {
-      const keyboardVisible = await this.isKeyboardVisible();
-
-      if (keyboardVisible) {
+      const keyboardVisible = await this.isKeyboardVisible(); 
+      if (!keyboardVisible) {
+        console.log("Keyboard is not visible.");
+      }
+      while (keyboardVisible && tryHideKeyboardTries < 5) {
         console.log("Keyboard is visible, pressing back button...");
         await this.executeCommand("adb shell input keyevent 111");
         if (await this.isKeyboardVisible()) {
           await this.executeCommand("adb shell input keyevent KEYCODE_BACK");
         }
-      } else {
-        console.log("Keyboard is not visible.");
       }
     } catch (error) {
       console.error("Failed to check or hide keyboard:", error);

@@ -41,21 +41,20 @@ class AndroidBot {
         console.log("killed app ", pkg);
     }
     // Method to hide keyboard if it's visible
-    async hideKeyboardIfVisible() {
+    async hideKeyboardIfVisible(tryHideKeyboardTries = 0) {
         try {
-            const keyboardVisible = await this.isKeyboardVisible();
-            if (keyboardVisible) {
+            const keyboardVisible = await this.isKeyboardVisible(); 
+            if (!keyboardVisible) {
+                console.log("Keyboard is not visible.");
+            }
+            while (keyboardVisible && tryHideKeyboardTries < 5) {
                 console.log("Keyboard is visible, pressing back button...");
                 await this.executeCommand("adb shell input keyevent 111");
                 if (await this.isKeyboardVisible()) {
                     await this.executeCommand("adb shell input keyevent KEYCODE_BACK");
-                }
-            }
-            else {
-                console.log("Keyboard is not visible.");
             }
         }
-        catch (error) {
+        } catch (error) {
             console.error("Failed to check or hide keyboard:", error);
         }
     }
