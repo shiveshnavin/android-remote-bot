@@ -60,6 +60,7 @@ class PostToInstagram extends pipelane_1.PipeTask {
         }
         for (let model of last) {
             try {
+                await bot.executeCommand('adb connect 127.0.0.1:5555')
                 let isDeviceOn = await bot.isScreenOn();
                 this.onLog("Is device on =", isDeviceOn);
                 if (!isDeviceOn) {
