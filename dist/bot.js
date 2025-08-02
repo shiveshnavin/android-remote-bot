@@ -18,8 +18,8 @@ class AndroidBot {
         try {
             // Start the Clipper app to handle clipboard operations
             await this.executeCommand("adb shell am startservice ca.zgrs.clipper/.ClipboardService");
-            await this.executeCommand("adb shell \"chmod +x ./copyclip\"");
             await this.executeCommand("adb shell \"pwd\"");
+            await this.executeCommand("adb shell \"chmod +x ./copyclip\"");
             console.log("Started Clipper app for clipboard operations.");
         }
         catch (error) {
