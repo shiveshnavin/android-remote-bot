@@ -84,7 +84,7 @@ class PostToInstagram extends pipelane_1.PipeTask {
                     continue;
                 }
                 this.posted.push(url);
-                let fileName = Date.now() + "_" + getFilenameFromUrl(url)
+                let fileName = Date.now() + "_" + getFilenameFromUrl(url);
                 let downloadDir = '/sdcard/Download';
                 let targetFile = downloadDir + "/" + fileName;
                 let downloadCmd = `wget -q -O ${targetFile} ${url}  > /dev/null 2>&1`;
@@ -116,7 +116,7 @@ class PostToInstagram extends pipelane_1.PipeTask {
             catch (error) {
                 await bot.pressBackKey(5);
                 console.log("Error processing schedule:", error);
-                this.onLog(`Error processing schedule: ${error.message}`, error);
+                this.onLog(`Error processing schedule: ${error.message}`);
                 model.status = false;
                 model.message = `Error processing schedule: ${error.message}`;
             }

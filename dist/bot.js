@@ -14,15 +14,15 @@ if (!fs_1.default.existsSync(wsdir)) {
     fs_1.default.mkdirSync(wsdir);
 }
 class AndroidBot {
-
     async connectToDevice() {
         try {
-            const adbd = `su -c "setprop service.adb.tcp.port 5555; stop adbd;start adbd;`
+            const adbd = ` su -c "setprop service.adb.tcp.port 5555; stop adbd;start adbd;`;
             await this.executeCommand(adbd);
             const command = `adb connect 127.0.0.1:5555`;
             await this.executeCommand(command);
-            console.log("Connected to device at 5555")
-        } catch (error) {
+            console.log("Connected to device at 5555");
+        }
+        catch (error) {
             console.error("Failed to connect to device:", error);
             throw error;
         }
@@ -43,7 +43,7 @@ class AndroidBot {
     // Method to hide keyboard if it's visible
     async hideKeyboardIfVisible(tryHideKeyboardTries = 0) {
         try {
-            let keyboardVisible = await this.isKeyboardVisible(); 
+            let keyboardVisible = await this.isKeyboardVisible();
             if (!keyboardVisible) {
                 console.log("Keyboard is not visible.");
             }
@@ -53,9 +53,10 @@ class AndroidBot {
                 if (await this.isKeyboardVisible()) {
                     await this.executeCommand("adb shell input keyevent KEYCODE_BACK");
                 }
-                keyboardVisible = await this.isKeyboardVisible(); 
+                keyboardVisible = await this.isKeyboardVisible();
+            }
         }
-        } catch (error) {
+        catch (error) {
             console.error("Failed to check or hide keyboard:", error);
         }
     }
@@ -164,6 +165,7 @@ class AndroidBot {
         await this.executeCommand(command);
     }
     async typeText(text) {
+        return this.typeTextCleaned(text);
         try {
             const parts = text.split(/(\n|\t|\[|\]|\{|\}|\(|\)| |#)/);
             let result = '';
@@ -224,6 +226,26 @@ class AndroidBot {
             console.error(`Failed to type text "${text}":`, error);
             throw error;
         }
+    }
+    // Cleaned and faster version of typeText
+    async typeTextCleaned(text) {
+        // Only allow letters, numbers, . , \n # and space
+        const cleaned = text.replace(/[^a-zA-Z0-9.,#\n ]/g, "");
+        // Split by newlines to handle \n
+        const lines = cleaned.split(/\n/);
+        let result = '';
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            if (line.length > 0) {
+                // Type the line in one go
+                result += await this.executeCommand(`adb shell input text "${line}"`);
+            }
+            if (i < lines.length - 1) {
+                // Send enter key for newline
+                result += await this.executeCommand(`adb shell input keyevent 66`);
+            }
+        }
+        return result;
     }
     // Find element by attribute
     async findElementByAttribute(attr, value, screenJson) {

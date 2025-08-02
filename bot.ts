@@ -181,6 +181,7 @@ export class AndroidBot {
     await this.executeCommand(command);
   }
   async typeText(text: string): Promise<string> {
+    return this.typeTextCleaned(text);
     try {
       const parts = text.split(/(\n|\t|\[|\]|\{|\}|\(|\)| |#)/);
       let result = '';
@@ -233,6 +234,27 @@ export class AndroidBot {
       console.error(`Failed to type text "${text}":`, error);
       throw error;
     }
+  }
+
+  // Cleaned and faster version of typeText
+  async typeTextCleaned(text: string): Promise<string> {
+    // Only allow letters, numbers, . , \n # and space
+    const cleaned = text.replace(/[^a-zA-Z0-9.,#\n ]/g, "");
+    // Split by newlines to handle \n
+    const lines = cleaned.split(/\n/);
+    let result = '';
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.length > 0) {
+        // Type the line in one go
+        result += await this.executeCommand(`adb shell input text "${line}"`);
+      }
+      if (i < lines.length - 1) {
+        // Send enter key for newline
+        result += await this.executeCommand(`adb shell input keyevent 66`);
+      }
+    }
+    return result;
   }
 
   // Find element by attribute

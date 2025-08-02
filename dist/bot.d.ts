@@ -1,9 +1,10 @@
 import { Node } from "./xml";
 export declare class AndroidBot {
+    connectToDevice(): Promise<void>;
     setVolumeToZero(): Promise<void>;
     setVolumeToMax(): Promise<void>;
     killApp(pkg: string): Promise<void>;
-    hideKeyboardIfVisible(): Promise<void>;
+    hideKeyboardIfVisible(tryHideKeyboardTries?: number): Promise<void>;
     isKeyboardVisible(): Promise<boolean>;
     shareVideoById(mediaId: string, targetActivity: string): Promise<void>;
     scanFile(filePath: string): Promise<void>;
@@ -15,6 +16,7 @@ export declare class AndroidBot {
     clickAtTopCenter(): Promise<void>;
     clearInputField(strokes: number): Promise<void>;
     typeText(text: string): Promise<string>;
+    typeTextCleaned(text: string): Promise<string>;
     findElementByAttribute(attr: string, value: string, screenJson?: any): Promise<Node>;
     findElementByLabel(label: string, screenJson?: any): Promise<Node>;
     clickAndHoldNode(node: Node, durationMs: number): Promise<void>;
@@ -27,5 +29,4 @@ export declare class AndroidBot {
     turnOffScreen(): Promise<void>;
     isScreenOn(): Promise<boolean>;
     executeCommand(command: string): Promise<string>;
-    connectToDevice(): Promise<void>;
 }

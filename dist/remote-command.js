@@ -8,6 +8,7 @@ const bot = new bot_1.AndroidBot();
 let listener = undefined;
 function initRemoteCommand(db) {
     let collection = 'android_bot_remote_cmd';
+    const deviceId = process.env.DEVICE_ID || 'default_device';
     const firestoreDb = db.db;
     if (listener) {
         try {
@@ -15,7 +16,9 @@ function initRemoteCommand(db) {
         }
         catch (e) { }
     }
-    listener = firestoreDb.collection(collection).onSnapshot(snapshot => {
+    listener = firestoreDb.collection(collection)
+        .where('deviceId', '==', deviceId)
+        .onSnapshot(snapshot => {
         snapshot.docChanges().forEach(change => {
             if (change.type === 'added' || change.type === 'modified') {
                 const commandData = change.doc.data();
