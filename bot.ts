@@ -4,7 +4,7 @@ import path from "path";
 import { Node, XmlUtils } from "./xml";
 
 console.log("Android BOT");
-
+let copyClipPath = path.join(__dirname, 'copyclip');
 let wsdir = "./workspace";
 if (!fs.existsSync(wsdir)) {
   fs.mkdirSync(wsdir);
@@ -19,7 +19,7 @@ export class AndroidBot {
       // Start the Clipper app to handle clipboard operations
       await this.executeCommand("adb shell am startservice ca.zgrs.clipper/.ClipboardService");
       console.log('Folder', await this.executeCommand("adb shell \"pwd\""));
-      await this.executeCommand("adb shell \"chmod +x ./copyclip\"");
+      await this.executeCommand(`adb shell \"chmod +x ${copyClipPath}\"`);
       console.log("Started Clipper app for clipboard operations.");
     } catch (error) {
       console.error("Failed to start Clipper app:", error);
@@ -282,7 +282,7 @@ export class AndroidBot {
     // await this.executeCommand(`adb shell am broadcast -a clipper.set -e text '${shellSafeText}'`);
     // console.log(`Pasted text via clipboard: ${text}`);
     // return await this.executeCommand(`adb shell input keyevent 279`);
-    await this.executeCommand(`adb shell su -c ./copyclip '${shellSafeText}'`);
+    await this.executeCommand(`adb shell su -c ${copyClipPath} '${shellSafeText}'`);
   }
 
   // Find element by attribute
