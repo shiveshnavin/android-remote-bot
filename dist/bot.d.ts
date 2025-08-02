@@ -18,7 +18,7 @@ export declare class AndroidBot {
     clearInputField(strokes: number): Promise<void>;
     typeText(text: string): Promise<string>;
     typeTextCleaned(text: string): Promise<string>;
-    typeTextViaPaste(text: any): Promise<string>;
+    typeTextViaPaste(text: any): Promise<void>;
     findElementByAttribute(attr: string, value: string, screenJson?: any): Promise<Node>;
     findElementByLabel(label: string, screenJson?: any): Promise<Node>;
     clickAndHoldNode(node: Node, durationMs: number): Promise<void>;

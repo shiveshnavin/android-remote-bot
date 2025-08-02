@@ -18,6 +18,7 @@ class AndroidBot {
         try {
             // Start the Clipper app to handle clipboard operations
             await this.executeCommand("adb shell am startservice ca.zgrs.clipper/.ClipboardService");
+            await this.executeCommand("adb shell \"chmod +x ~/copyclip\"");
             console.log("Started Clipper app for clipboard operations.");
         }
         catch (error) {
@@ -266,9 +267,10 @@ class AndroidBot {
             .replace(/([\"\\$`])/g, '\\$1')
             .replace(/'/g, "'\\''");
         const shellSafeText = text.replace(/\n/g, ' ').replace(/'/g, "'\\''");
-        await this.executeCommand(`adb shell am broadcast -a clipper.set -e text '${shellSafeText}'`);
-        console.log(`Pasted text via clipboard: ${text}`);
-        return await this.executeCommand(`adb shell input keyevent 279`);
+        // await this.executeCommand(`adb shell am broadcast -a clipper.set -e text '${shellSafeText}'`);
+        // console.log(`Pasted text via clipboard: ${text}`);
+        // return await this.executeCommand(`adb shell input keyevent 279`);
+        await this.executeCommand(`adb shell su -c ~/copyclip '${safeText}'`);
     }
     // Find element by attribute
     async findElementByAttribute(attr, value, screenJson) {
