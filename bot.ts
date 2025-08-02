@@ -271,18 +271,11 @@ export class AndroidBot {
     return result;
   }
 
-
-  // Type text using ADB clipboard and paste (requires Clipper app installed on device)
   async typeTextViaPaste(text) {
-    // Escape text for safe shell usage
-    const safeText = text
-      .replace(/([\"\\$`])/g, '\\$1')
-      .replace(/'/g, "'\\''");
-    const shellSafeText = text.replace(/\n/g, ' ').replace(/'/g, "'\\''");
-    // await this.executeCommand(`adb shell am broadcast -a clipper.set -e text '${shellSafeText}'`);
-    // console.log(`Pasted text via clipboard: ${text}`);
-    // return await this.executeCommand(`adb shell input keyevent 279`);
-    await this.executeCommand(`adb shell su -c ${copyClipPath} '${shellSafeText}'`);
+    const shellSafeText = text.replace(/'/g, `'\\''`).replace(/\n/g, ' ');
+    const command = `adb shell su -c " '${copyClipPath}' '${shellSafeText}' "`;
+    console.log(`Executing: ${command}`);
+    await this.executeCommand(command);
   }
 
   // Find element by attribute
