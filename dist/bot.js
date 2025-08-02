@@ -270,7 +270,7 @@ class AndroidBot {
         // await this.executeCommand(`adb shell am broadcast -a clipper.set -e text '${shellSafeText}'`);
         // console.log(`Pasted text via clipboard: ${text}`);
         // return await this.executeCommand(`adb shell input keyevent 279`);
-        await this.executeCommand(`adb shell su -c ~/copyclip '${safeText}'`);
+        await this.executeCommand(`adb shell su -c ~/copyclip '${shellSafeText}'`);
     }
     // Find element by attribute
     async findElementByAttribute(attr, value, screenJson) {
