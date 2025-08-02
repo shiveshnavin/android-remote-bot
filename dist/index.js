@@ -126,3 +126,4 @@ async function switchProfile(newUserName) {
     }
 }
 // shareAndPost();
+bot.hideKeyboardIfVisible()

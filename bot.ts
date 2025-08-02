@@ -14,6 +14,17 @@ if (!fs.existsSync(wsdir)) {
 export class AndroidBot {
 
 
+  async startCopyClip() {
+    try {
+      // Start the Clipper app to handle clipboard operations
+      await this.executeCommand("adb shell am startservice ca.zgrs.clipper/.ClipboardService");
+      console.log("Started Clipper app for clipboard operations.");
+    } catch (error) {
+      console.error("Failed to start Clipper app:", error);
+      throw error;
+    }
+  }
+
   async connectToDevice(): Promise<void> {
     try {
       const adbd = ` su -c "setprop service.adb.tcp.port 5555; stop adbd;start adbd;`
@@ -53,6 +64,7 @@ export class AndroidBot {
       while (keyboardVisible && tryHideKeyboardTries < 5) {
         console.log("Keyboard is visible, pressing back button...");
         await this.executeCommand("adb shell input keyevent 111");
+        await this.executeCommand("adb shell input keyevent KEYCODE_ESCAPE");
         if (await this.isKeyboardVisible()) {
           await this.executeCommand("adb shell input keyevent KEYCODE_BACK");
         }
@@ -181,7 +193,7 @@ export class AndroidBot {
     await this.executeCommand(command);
   }
   async typeText(text: string): Promise<string> {
-    return this.typeTextCleaned(text);
+    return this.typeTextViaPaste(text);
     try {
       const parts = text.split(/(\n|\t|\[|\]|\{|\}|\(|\)| |#)/);
       let result = '';
@@ -255,6 +267,19 @@ export class AndroidBot {
       }
     }
     return result;
+  }
+
+
+  // Type text using ADB clipboard and paste (requires Clipper app installed on device)
+  async typeTextViaPaste(text) {
+    // Escape text for safe shell usage
+    const safeText = text
+      .replace(/([\"\\$`])/g, '\\$1')
+      .replace(/'/g, "'\\''");
+    const shellSafeText = text.replace(/\n/g, ' ').replace(/'/g, "'\\''");
+    await this.executeCommand(`adb shell am broadcast -a clipper.set -e text '${shellSafeText}'`);
+    console.log(`Pasted text via clipboard: ${text}`);
+    return await this.executeCommand(`adb shell input keyevent 279`);
   }
 
   // Find element by attribute

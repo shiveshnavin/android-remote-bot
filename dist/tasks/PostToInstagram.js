@@ -92,6 +92,7 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 this.onLog('Posting start: ', caption);
                 await (bot.executeCommand(downloadCmd).catch(e => { }));
                 await bot.setVolumeToZero();
+                await bot.startCopyClip();
                 await bot.pressBackKey(5);
                 if (model.tenant) {
                     await bot.openActivity("com.instagram.android/com.instagram.android.activity.MainTabActivity");
