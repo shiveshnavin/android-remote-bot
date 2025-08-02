@@ -9,7 +9,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const xml_1 = require("./xml");
 console.log("Android BOT");
-let copyClipPath = path_1.default.join(__dirname, 'copyclip');
+let copyClipPath = path_1.default.join(__dirname, '../copyclip');
 let wsdir = "./workspace";
 if (!fs_1.default.existsSync(wsdir)) {
     fs_1.default.mkdirSync(wsdir);

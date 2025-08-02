@@ -4,7 +4,7 @@ import path from "path";
 import { Node, XmlUtils } from "./xml";
 
 console.log("Android BOT");
-let copyClipPath = path.join(__dirname, 'copyclip');
+let copyClipPath = path.join(__dirname, '../copyclip');
 let wsdir = "./workspace";
 if (!fs.existsSync(wsdir)) {
   fs.mkdirSync(wsdir);
