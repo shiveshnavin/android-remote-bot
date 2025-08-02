@@ -126,3 +126,4 @@ async function switchProfile(newUserName) {
     }
 }
 // shareAndPost();
+bot.typeTextViaPaste(`Dont let your fears stop you from dreaming, as the moment you allow fear to take over is the moment you surrender your potential for greatness. Believe in yourself and your abilities, and remember that every great accomplishment started with a dream, so dont let fear hold you back from achieving yours. . . . #DreamBig #FearLess #MotivationMonday #BelieveInYourself #OvercomeFear #SuccessMindset`)
