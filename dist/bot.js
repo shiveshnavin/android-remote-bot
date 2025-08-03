@@ -264,7 +264,7 @@ class AndroidBot {
     }
     async typeTextViaPaste(text) {
         const base64Text = Buffer.from(text).toString("base64");
-        const command = `adb shell su -c 'echo "${base64Text}" | base64 -d | termux-clipboard-set'`;
+        const command = `adb shell 'echo "${base64Text}" | base64 -d | termux-clipboard-set'`;
 
         await this.executeCommand(command);
         return await this.executeCommand(`adb shell input keyevent 279`);
