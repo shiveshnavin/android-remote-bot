@@ -10,6 +10,7 @@ const path_1 = __importDefault(require("path"));
 const xml_1 = require("./xml");
 console.log("Android BOT");
 let copyClipPath = path_1.default.join(__dirname, '../copyclip');
+let termuxClipPath = "/data/data/com.termux/files/usr/bin/termux-clipboard-set";
 let wsdir = "./workspace";
 if (!fs_1.default.existsSync(wsdir)) {
     fs_1.default.mkdirSync(wsdir);
@@ -263,10 +264,8 @@ class AndroidBot {
         return result;
     }
     async typeTextViaPaste(text) {
-        const shellSafeText = text.replace(/'/g, `'\\''`).replace(/\n/g, ' ');
         const base64Text = Buffer.from(text, 'utf-8').toString('base64');
-
-        const command = `adb shell su -c "\\\" echo '${base64Text}' | base64 -d | '/data/data/com.termux/files/usr/bin/termux-clipboard-set'\\\""`;// '${shellSafeText}'
+        const command = `adb shell su -c "\\\" echo '${base64Text}' | base64 -d | '${termuxClipPath}'\\\""`;
         await this.executeCommand(command);
         return await this.executeCommand(`adb shell input keyevent 279`);
     }

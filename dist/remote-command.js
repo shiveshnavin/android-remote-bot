@@ -21,7 +21,7 @@ function initRemoteCommand(db) {
     listener = firestoreDb.collection(collection)
         .where('deviceId', '==', deviceId)
         .onSnapshot(snapshot => {
-            snapshot.docChanges().forEach(change => {
+        snapshot.docChanges().forEach(change => {
             if (change.type === 'added' || change.type === 'modified') {
                 const commandData = change.doc.data();
                 const commandId = change.doc.id;

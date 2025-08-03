@@ -5,6 +5,7 @@ import { Node, XmlUtils } from "./xml";
 
 console.log("Android BOT");
 let copyClipPath = path.join(__dirname, '../copyclip');
+let termuxClipPath = "/data/data/com.termux/files/usr/bin/termux-clipboard-set";
 let wsdir = "./workspace";
 if (!fs.existsSync(wsdir)) {
   fs.mkdirSync(wsdir);
@@ -272,9 +273,8 @@ export class AndroidBot {
   }
 
   async typeTextViaPaste(text) {
-    const shellSafeText = text.replace(/'/g, `'\\''`)
-    //.replace(/\n/g, ' ');
-    const command = `adb shell su -c "\\\"'${copyClipPath}' '${shellSafeText}'\\\""`;
+    const base64Text = Buffer.from(text, 'utf-8').toString('base64');
+    const command = `adb shell su -c "\\\" echo '${base64Text}' | base64 -d | '${termuxClipPath}'\\\""`;
     await this.executeCommand(command);
     return await this.executeCommand(`adb shell input keyevent 279`);
   }
