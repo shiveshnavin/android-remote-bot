@@ -263,12 +263,17 @@ class AndroidBot {
         return result;
     }
     async typeTextViaPaste(text) {
-        const base64Text = Buffer.from(text).toString("base64");
-        const command = `adb shell 'echo "${base64Text}" | base64 -d | termux-clipboard-set'`;
+       // Encode text as base64 to safely pass through ADB shell
+       const base64Text = Buffer.from(text, 'utf-8').toString('base64');
 
-        await this.executeCommand(command);
-        return await this.executeCommand(`adb shell input keyevent 279`);
-    }
+       // Construct ADB command that decodes base64 and pipes to copyclip
+       const command = `adb shell su -c "echo '${base64Text}' | base64 -d | '${copyClipPath}'"`;
+
+       // Execute: copy to clipboard and then simulate paste key
+       await this.executeCommand(command);
+       return await this.executeCommand(`adb shell input keyevent 279`);
+   }
+
     // Find element by attribute
     async findElementByAttribute(attr, value, screenJson) {
         const xml = new xml_1.XmlUtils();
