@@ -272,7 +272,8 @@ export class AndroidBot {
   }
 
   async typeTextViaPaste(text) {
-    const shellSafeText = text.replace(/'/g, `'\\''`).replace(/\n/g, ' ');
+    const shellSafeText = text.replace(/'/g, `'\\''`)
+    //.replace(/\n/g, ' ');
     const command = `adb shell su -c "\\\"'${copyClipPath}' '${shellSafeText}'\\\""`;
     await this.executeCommand(command);
     return await this.executeCommand(`adb shell input keyevent 279`);
