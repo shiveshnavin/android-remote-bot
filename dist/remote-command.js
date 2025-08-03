@@ -22,6 +22,7 @@ function initRemoteCommand(db) {
         .where('deviceId', '==', deviceId)
         .onSnapshot(snapshot => {
         snapshot.docChanges().forEach(change => {
+            console.log('remote-cmd: Change detected:', change);
             if (change.type === 'added' || change.type === 'modified') {
                 const commandData = change.doc.data();
                 const commandId = change.doc.id;
