@@ -16,6 +16,8 @@ function initRemoteCommand(db) {
         }
         catch (e) { }
     }
+    // Track processed command IDs to prevent infinite loop
+    const processingCommands = new Set();
     listener = firestoreDb.collection(collection)
         .where('deviceId', '==', deviceId)
         .onSnapshot(snapshot => {
@@ -23,7 +25,12 @@ function initRemoteCommand(db) {
             if (change.type === 'added' || change.type === 'modified') {
                 const commandData = change.doc.data();
                 const commandId = change.doc.id;
+                // Prevent re-processing the same command
+                if (processingCommands.has(commandId)) {
+                    return;
+                }
                 if (commandData.status === 'SCHEDULED') {
+                    processingCommands.add(commandId);
                     console.log(`remote-cmd: Processing scheduled command: ${commandData.cmd}`);
                     firestoreDb.collection(collection).doc(commandId).update({
                         status: 'IN_PROGRESS',
@@ -44,6 +51,8 @@ function initRemoteCommand(db) {
                                 output: error.message || 'Unknown error',
                                 endTime: new Date().toISOString()
                             });
+                        }).finally(() => {
+                            processingCommands.delete(commandId);
                         });
                     }).catch(error => {
                         console.error(`remote-cmd: Failed to update status to IN_PROGRESS: ${error}`);
