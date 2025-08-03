@@ -126,4 +126,3 @@ async function switchProfile(newUserName) {
     }
 }
 // shareAndPost();
-bot.typeTextViaPaste(`The best way to achieve your dreams is to wake up and chase them, taking consistent and deliberate action towards making your aspirations a reality. By doing so, you'll be one step closer to turning your visions into accomplishments and living a life that truly reflects your passions and goals.\n.\n.\n.\n#MotivationMonday #DreamBig #ChaseYourDreams #SuccessMindset #GoalOriented`)
