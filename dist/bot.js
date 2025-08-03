@@ -264,7 +264,9 @@ class AndroidBot {
     }
     async typeTextViaPaste(text) {
         const shellSafeText = text.replace(/'/g, `'\\''`).replace(/\n/g, ' ');
-        const command = `adb shell su -c "\\\" echo '${base64Text}' | base64 -d | '${copyClipPath}' '${shellSafeText}'\\\""`;
+        const base64Text = Buffer.from(text, 'utf-8').toString('base64');
+
+        const command = `adb shell su -c "\\\" echo '${base64Text}' | base64 -d | '${copyClipPath}'\\\""`;// '${shellSafeText}'
         await this.executeCommand(command);
         return await this.executeCommand(`adb shell input keyevent 279`);
     }
