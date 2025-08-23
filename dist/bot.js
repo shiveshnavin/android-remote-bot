@@ -26,7 +26,6 @@ class AndroidBot {
         }
         catch (error) {
             console.error("Failed to start Clipper app:", error);
-            throw error;
         }
     }
     async connectToDevice() {

@@ -24,7 +24,6 @@ export class AndroidBot {
       console.log("Started Clipper app for clipboard operations.");
     } catch (error) {
       console.error("Failed to start Clipper app:", error);
-      throw error;
     }
   }
 
