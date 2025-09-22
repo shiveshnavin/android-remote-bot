@@ -262,7 +262,7 @@ class AndroidBot {
         }
         return result;
     }
-    async typeTextViaPaste(text) {
+    async typeTextViaPaste(text = '...') {
         const base64Text = Buffer.from(text, 'utf-8').toString('base64');
         const command = `adb shell su -c "\\\" echo '${base64Text}' | base64 -d | '${termuxClipPath}'\\\""`;
         await this.executeCommand(command);
