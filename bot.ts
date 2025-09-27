@@ -624,6 +624,31 @@ export class AndroidBot {
   }
 
 
+  /**
+   * 
+   * @param brightness 0-100
+   */
+  async setBrightness(brightnessPercent: number) {
+    try {
+      const disableAutoBrightness = `adb shell su -c "settings put system screen_brightness_mode 0"`;
+      await this.executeCommand(disableAutoBrightness);
+      let maxBrightness = 2000;
+      let brightness = Math.floor((brightnessPercent / 100) * maxBrightness);
+      if (brightness > maxBrightness) {
+        brightness = maxBrightness;
+      }
+      if (brightness <= 0) {
+        brightness = 0;
+      }
+      const command = `adb shell su -c "settings put system screen_brightness ${brightness}"`;
+      await this.executeCommand(command);
+      console.log(`Brightness set to ${brightness} successfully.`);
+    } catch (error) {
+      console.error(`Failed to set brightness:`, error);
+      throw error;
+    }
+  }
+
   // Turn on the screen
   async turnOnScreen(): Promise<void> {
     await this.executeCommand("adb shell input keyevent KEYCODE_WAKEUP");

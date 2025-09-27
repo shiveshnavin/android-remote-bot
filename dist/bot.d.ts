@@ -53,6 +53,11 @@ export declare class AndroidBot {
     openActivity(activityName: string): Promise<any>;
     enableApp(packageName: string): Promise<void>;
     disableApp(packageName: string): Promise<void>;
+    /**
+     *
+     * @param brightness 0-100
+     */
+    setBrightness(brightnessPercent: number): Promise<void>;
     turnOnScreen(): Promise<void>;
     wakeup(): Promise<void>;
     turnOffScreen(): Promise<void>;
