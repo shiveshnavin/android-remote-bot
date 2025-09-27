@@ -492,8 +492,9 @@ class AndroidBot {
         try {
             let _tempDump = "/sdcard/window_dump.xml";
             await this.executeCommand("adb shell uiautomator dump " + _tempDump);
+            console.log("Dumped screen to xml");
             const xmlContent = await this.executeCommand("adb shell cat " + _tempDump);
-            console.log("Dumped screen to xml", xmlContent.length, "bytes");
+            console.log("Size of xml:", xmlContent.length, "bytes");
             await this.executeCommand("adb shell rm " + _tempDump);
             fs_1.default.writeFileSync(dumpFile || wsdir + "/dump.xml", xmlContent);
             let xml = new xml_1.XmlUtils(xmlContent);
