@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/server.js",
+    "start:remote": "PORT=4041 node dist/server.js",
     "serve": "ts-node-dev --transpile-only server.ts",
     "build": "rm -rf dist && tsc || sh copy-files.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
