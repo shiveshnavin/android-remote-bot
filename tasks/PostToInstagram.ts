@@ -114,7 +114,8 @@ export class PostToInstagram extends PipeTask<any, any> {
                 let fileName = Date.now() + "_" + getFilenameFromUrl(url)
                 let downloadDir = '/sdcard/Download'
                 let targetFile = downloadDir + "/" + fileName
-                let downloadCmd = `wget -q -O ${targetFile} ${url}  > /dev/null 2>&1`
+                let localFile = "./workspace/" + fileName;
+                let downloadCmd = `wget -q -O ${localFile} ${url} > /dev/null 2>&1 && adb push ${localFile} ${targetFile}`;
 
                 this.onLog(fileName, 'downloading to', targetFile)
                 this.onLog('Posting start: ', caption)
