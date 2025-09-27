@@ -28,9 +28,19 @@ class AndroidBot {
             console.error("W: Failed to start Clipper app:", error.message);
         }
     }
+    async isConnected() {
+        try {
+            const output = await this.executeCommand("adb devices");
+            return output.includes("device") || output.includes("emulator");
+        }
+        catch (error) {
+            console.error("Failed to check device connection:", error);
+            return false;
+        }
+    }
     async connectToDevice() {
         try {
-            const adbd = `su -c "setprop service.adb.tcp.port 5555; stop adbd;start adbd;"`;
+            const adbd = `adb shell su -c "setprop service.adb.tcp.port 5555; stop adbd;start adbd;"`;
             await this.executeCommand(adbd);
             const command = `adb connect 127.0.0.1:5555`;
             await this.executeCommand(command);
@@ -144,6 +154,108 @@ class AndroidBot {
     // Sleep method
     async sleep(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+    //swipe from x1,y1 to x2,y2
+    async swipe(x1, y1, x2, y2, duration = 200) {
+        try {
+            const command = `adb shell input swipe ${x1} ${y1} ${x2} ${y2} ${duration}`;
+            const result = await this.executeCommand(command);
+            console.log(`Swiped from (${x1}, ${y1}) to (${x2}, ${y2}) over ${duration}ms.`);
+        }
+        catch (error) {
+            console.error(`Failed to swipe:`, error);
+            throw error;
+        }
+    }
+    async getScreenResolution() {
+        try {
+            const sizeOutput = await this.executeCommand(`adb shell wm size`);
+            const match = sizeOutput.match(/Physical size:\s*(\d+)x(\d+)/);
+            if (!match)
+                throw new Error("Unable to determine screen size");
+            const width = parseInt(match[1], 10);
+            const height = parseInt(match[2], 10);
+            return { width, height };
+        }
+        catch (error) {
+            console.error(`Failed to get screen resolution:`, error);
+            throw error;
+        }
+    }
+    async swipeRightFromCenter() {
+        try {
+            // Get screen size (width x height)
+            const match = await this.getScreenResolution();
+            const width = match.width;
+            const height = match.height;
+            const x1 = Math.floor(width * 0.2); // Starting x (20% from left)
+            const y1 = Math.floor(height / 2); // Starting y (center)
+            const x2 = Math.floor(width * 0.8); // Ending x (80% from left)
+            const y2 = Math.floor(height / 2); // Ending y (center)
+            // Perform the swipe
+            await this.swipe(x1, y1, x2, y2);
+            console.log(`Swiped right from center.`);
+        }
+        catch (error) {
+            console.error(`Failed to swipe right from center:`, error);
+            throw error;
+        }
+    }
+    async swipeLeftFromCenter() {
+        try {
+            // Get screen size (width x height)
+            const match = await this.getScreenResolution();
+            const width = match.width;
+            const height = match.height;
+            const x1 = Math.floor(width * 0.8); // Starting x (80% from left)
+            const y1 = Math.floor(height / 2); // Starting y (center)
+            const x2 = Math.floor(width * 0.2); // Ending x (20% from left)
+            const y2 = Math.floor(height / 2); // Ending y (center)
+            // Perform the swipe
+            await this.swipe(x1, y1, x2, y2);
+            console.log(`Swiped left from center.`);
+        }
+        catch (error) {
+            console.error(`Failed to swipe left from center:`, error);
+            throw error;
+        }
+    }
+    async swipeUpFromCenter() {
+        try {
+            const match = await this.getScreenResolution();
+            const width = match.width;
+            const height = match.height;
+            const x1 = Math.floor(width / 2); // Starting x (center)
+            const y1 = Math.floor(height * 0.8); // Starting y (80% from top)
+            const x2 = Math.floor(width / 2); // Ending x (center)
+            const y2 = Math.floor(height * 0.2); // Ending y (20% from top)
+            // Perform the swipe
+            await this.swipe(x1, y1, x2, y2);
+            console.log(`Swiped up from center.`);
+        }
+        catch (error) {
+            console.error(`Failed to swipe up from center:`, error);
+            throw error;
+        }
+    }
+    async swipeDownFromCenter() {
+        try {
+            // Get screen size (width x height)
+            const match = await this.getScreenResolution();
+            const width = match.width;
+            const height = match.height;
+            const x1 = Math.floor(width / 2); // Starting x (center)
+            const y1 = Math.floor(height * 0.2); // Starting y (20% from top)
+            const x2 = Math.floor(width / 2); // Ending x (center)
+            const y2 = Math.floor(height * 0.8); // Ending y (80% from top)
+            // Perform the swipe
+            await this.swipe(x1, y1, x2, y2);
+            console.log(`Swiped down from center.`);
+        }
+        catch (error) {
+            console.error(`Failed to swipe down from center:`, error);
+            throw error;
+        }
     }
     async dismissBottomSheetIfPresent(screenJson) {
         try {
@@ -268,6 +380,28 @@ class AndroidBot {
         await this.executeCommand(command);
         return await this.executeCommand(`adb shell input keyevent 279`);
     }
+    /**
+     *
+     * @param runnable must return a non-null value to mark success, can return a promise
+     * @param timeout
+     */
+    async waitFor(runnable, timeout, pollInterval = 1000, label) {
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeout) {
+            if (label) {
+                console.log(`Waiting for ${label}...`);
+            }
+            const result = await runnable();
+            if (result) {
+                return result;
+            }
+            await this.sleep(pollInterval);
+        }
+        if (label) {
+            console.log(`waitFor timed out for ${label} after ${timeout}ms`);
+        }
+        throw new Error(`waitFor timed out after ${timeout}ms`);
+    }
     // Find element by attribute
     async findElementByAttribute(attr, value, screenJson) {
         const xml = new xml_1.XmlUtils();
@@ -340,17 +474,36 @@ class AndroidBot {
         }
     }
     // Dump screen XML layout
-    async dumpScreenXml() {
+    async dumpScreenXml(dumpFile) {
         try {
-            let dumpFile = "/sdcard/window_dump.xml";
-            await this.executeCommand("adb shell uiautomator dump " + dumpFile);
-            const xmlContent = await this.executeCommand("adb shell cat " + dumpFile);
-            fs_1.default.writeFileSync("dump.xml", xmlContent);
+            let _tempDump = "/sdcard/window_dump.xml";
+            await this.executeCommand("adb shell uiautomator dump " + _tempDump);
+            const xmlContent = await this.executeCommand("adb shell cat " + _tempDump);
+            fs_1.default.writeFileSync(dumpFile || wsdir + "/dump.xml", xmlContent);
             let xml = new xml_1.XmlUtils(xmlContent);
             return xml.parseXml(xmlContent);
         }
         catch (error) {
             console.error("Failed to dump XML layout:", error);
+            throw error;
+        }
+    }
+    /**
+     *
+     * @param packageName package name
+     * @param intent optional intent, defaults to main launcher
+     */
+    async startApp(packageName, intent) {
+        try {
+            const command = intent
+                ? `adb shell am start -n ${packageName}/${intent}`
+                : `adb shell monkey -p ${packageName} -c android.intent.category.LAUNCHER 1`;
+            const result = await this.executeCommand(command);
+            console.log(`App ${packageName} started successfully.`);
+            return result;
+        }
+        catch (error) {
+            console.error(`Failed to start app ${packageName}:`, error);
             throw error;
         }
     }
@@ -370,10 +523,36 @@ class AndroidBot {
             throw error;
         }
     }
+    async enableApp(packageName) {
+        try {
+            const command = `adb shell pm enable ${packageName}`;
+            await this.executeCommand(command);
+            console.log(`App ${packageName} enabled successfully.`);
+        }
+        catch (error) {
+            console.error(`Failed to enable app ${packageName}:`, error);
+            throw error;
+        }
+    }
+    async disableApp(packageName) {
+        try {
+            const command = `adb shell pm disable ${packageName}`;
+            await this.executeCommand(command);
+            console.log(`App ${packageName} disabled successfully.`);
+        }
+        catch (error) {
+            console.error(`Failed to disable app ${packageName}:`, error);
+            throw error;
+        }
+    }
     // Turn on the screen
     async turnOnScreen() {
         await this.executeCommand("adb shell input keyevent KEYCODE_WAKEUP");
         await this.executeCommand("adb shell input keyevent KEYCODE_MENU");
+    }
+    // Turn on the screen
+    async wakeup() {
+        return this.turnOnScreen();
     }
     async turnOffScreen() {
         await this.executeCommand("adb shell input keyevent 26");

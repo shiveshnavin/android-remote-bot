@@ -10,14 +10,21 @@ const EvaluateJsTask_1 = require("./EvaluateJsTask");
 class LoopEvaluateJsTask extends EvaluateJsTask_1.EvaluateJsTask {
     static TASK_VARIANT_NAME = "loop-eval-js";
     constructor(variantName) {
-        super(LoopEvaluateJsTask.TASK_VARIANT_NAME);
+        super(variantName || LoopEvaluateJsTask.TASK_VARIANT_NAME);
     }
     describe() {
         return {
             summary: "Process last output using JS. Must return in format [{status:true}]",
             inputs: {
                 additionalInputs: {
-                    js: "console.log(pl.inputs);\n//must return an array in output\n[{status:true, pl_inputs:pl.inputs}]"
+                    js: `// available variables: js, pl, input, prev, axios, Utils = EvalJSUtils
+async function run(){
+console.log(pl.inputs);
+//must return an array in output
+return [{status:true, pl_inputs:pl.inputs}];
+}
+run();
+`
                 },
                 last: [{
                         status: true
