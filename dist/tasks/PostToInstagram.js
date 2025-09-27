@@ -89,6 +89,7 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 let targetFile = downloadDir + "/" + fileName;
                 let localFile = "./workspace/" + fileName;
                 let downloadCmd = `wget -q -O ${localFile} ${url} > /dev/null 2>&1 && adb push ${localFile} ${targetFile}`;
+                await bot.scanFile(targetFile);
                 this.onLog(fileName, 'downloading to', targetFile);
                 this.onLog('Posting start: ', caption);
                 await (bot.executeCommand(downloadCmd).catch(e => { }));
