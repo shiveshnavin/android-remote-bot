@@ -8,6 +8,7 @@ const child_process_1 = require("child_process");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const xml_1 = require("./xml");
+const detect_bounds_1 = require("./detect-bounds");
 console.log("Android BOT");
 let copyClipPath = path_1.default.join(__dirname, '../copyclip');
 let termuxClipPath = "/data/data/com.termux/files/usr/bin/termux-clipboard-set";
@@ -485,6 +486,17 @@ class AndroidBot {
         }
         catch (error) {
             console.error("Failed to dump XML layout:", error);
+            throw error;
+        }
+    }
+    async captureBounds(node, targetFile) {
+        let bounds = node.$.bounds;
+        try {
+            targetFile = await (0, detect_bounds_1.detectBounds)(bounds, targetFile);
+            console.log("Captured", bounds, "bounds to ", targetFile);
+        }
+        catch (error) {
+            console.error("Failed to capture bounds:", error);
             throw error;
         }
     }

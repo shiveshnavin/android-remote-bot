@@ -42,6 +42,7 @@ export declare class AndroidBot {
     clickAndHold(x: number, y: number, durationMs: number): Promise<any>;
     clickAt(x: number, y: number): Promise<any>;
     dumpScreenXml(dumpFile?: string): Promise<any>;
+    captureBounds(node: Node, targetFile?: string): Promise<void>;
     /**
      *
      * @param packageName package name

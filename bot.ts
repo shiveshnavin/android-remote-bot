@@ -2,6 +2,7 @@ import { exec } from "child_process";
 import fs from "fs";
 import path from "path";
 import { Node, XmlUtils } from "./xml";
+import { detectBounds } from "./detect-bounds";
 
 console.log("Android BOT");
 let copyClipPath = path.join(__dirname, '../copyclip');
@@ -527,6 +528,17 @@ export class AndroidBot {
       return xml.parseXml(xmlContent);
     } catch (error) {
       console.error("Failed to dump XML layout:", error);
+      throw error;
+    }
+  }
+
+  async captureBounds(node: Node, targetFile?: string) {
+    let bounds = node.$.bounds;
+    try {
+      targetFile = await detectBounds(bounds, targetFile);
+      console.log("Captured", bounds, "bounds to ", targetFile);
+    } catch (error) {
+      console.error("Failed to capture bounds:", error);
       throw error;
     }
   }
