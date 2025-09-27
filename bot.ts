@@ -670,7 +670,7 @@ export class AndroidBot {
   isScreenOn(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       return this.executeCommand(
-        "su -c dumpsys power | grep mHalInteractiveModeEnabled"
+        `adb shell su -c "dumpsys power | grep mHalInteractiveModeEnabled"`
       ).then((stdout) => {
         const screenIsOn = stdout.includes("mHalInteractiveModeEnabled=true");
         resolve(screenIsOn);

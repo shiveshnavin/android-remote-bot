@@ -614,7 +614,7 @@ class AndroidBot {
     // Check if the screen is on
     isScreenOn() {
         return new Promise((resolve, reject) => {
-            return this.executeCommand("su -c dumpsys power | grep mHalInteractiveModeEnabled").then((stdout) => {
+            return this.executeCommand(`adb shell su -c "dumpsys power | grep mHalInteractiveModeEnabled"`).then((stdout) => {
                 const screenIsOn = stdout.includes("mHalInteractiveModeEnabled=true");
                 resolve(screenIsOn);
             }).catch(reject);
