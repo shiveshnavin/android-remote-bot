@@ -22,7 +22,7 @@ const dbCreds = JSON.parse(firebaseCreds);
 const db = new multi_db_orm_1.FireStoreDB(dbCreds);
 // must use FireStoreDB with this only
 (0, remote_command_1.initRemoteCommand)(db);
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 app.use('/bot', (req, res) => {
     res.send({
         status: 'Bot up'
