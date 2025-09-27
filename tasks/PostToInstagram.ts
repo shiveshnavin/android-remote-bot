@@ -29,9 +29,9 @@ export class PostToInstagram extends PipeTask<any, any> {
     static TASK_TYPE_NAME: string = 'android-bot';
 
     bot: AndroidBot
-    constructor() {
+    constructor(bot?: AndroidBot) {
         super(PostToInstagram.TASK_TYPE_NAME, PostToInstagram.TASK_VARIANT_NAME);
-        this.bot = new AndroidBot()
+        this.bot = bot || new AndroidBot()
     }
 
     kill(): boolean {

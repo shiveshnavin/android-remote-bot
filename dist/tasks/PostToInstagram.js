@@ -12,9 +12,9 @@ class PostToInstagram extends pipelane_1.PipeTask {
     static TASK_VARIANT_NAME = 'instagram-bot';
     static TASK_TYPE_NAME = 'android-bot';
     bot;
-    constructor() {
+    constructor(bot) {
         super(PostToInstagram.TASK_TYPE_NAME, PostToInstagram.TASK_VARIANT_NAME);
-        this.bot = new bot_1.AndroidBot();
+        this.bot = bot || new bot_1.AndroidBot();
     }
     kill() {
         return true;

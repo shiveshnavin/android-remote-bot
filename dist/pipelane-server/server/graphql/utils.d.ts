@@ -1,4 +1,5 @@
-import { TaskVariantConfig } from "pipelane";
+import PipeLane, { TaskVariantConfig } from "pipelane";
+import { Status } from "../../gen/model";
 export declare function generateTaskTypeResolvers(variantConfig: TaskVariantConfig): {
     TaskType: {
         description: (parent: any) => import("pipelane").PipeTaskDescription;
@@ -14,3 +15,7 @@ export declare function generateTaskTypeResolvers(variantConfig: TaskVariantConf
         }[];
     };
 };
+export declare function getTasksExecFromPipelane(cached: PipeLane): any[];
+export declare function mapStatus(event: any, output: ({
+    status: Status;
+} & any)[]): Status;

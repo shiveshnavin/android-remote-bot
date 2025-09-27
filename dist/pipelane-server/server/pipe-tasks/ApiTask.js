@@ -22,6 +22,7 @@ class ApiTask extends pipelane_1.PipeTask {
             inputs: {
                 last: [],
                 additionalInputs: {
+                    retry: 0,
                     url: "string, the url of the API",
                     method: "string, Http method",
                     headers: "object, an object of headers"
@@ -31,6 +32,7 @@ class ApiTask extends pipelane_1.PipeTask {
     }
     async execute(pipeWorksInstance, input) {
         input = input.additionalInputs;
+        let retryRemaining = input.additionalInputs?.retry || 0;
         if (!input.url) {
             return [{
                     status: false,
@@ -38,27 +40,31 @@ class ApiTask extends pipelane_1.PipeTask {
                 }];
         }
         let options = input;
-        try {
-            let response = await (0, axios_1.default)(options);
-            if (response) {
-                return [{
-                        status: response.status < 300,
-                        statusCode: response.status,
-                        headers: response.headers,
-                        data: response?.data
+        let err = [];
+        do {
+            try {
+                let response = await (0, axios_1.default)(options);
+                if (response) {
+                    return [{
+                            status: response.status < 300,
+                            statusCode: response.status,
+                            headers: response.headers,
+                            data: response?.data
+                        }];
+                }
+            }
+            catch (e) {
+                pipeWorksInstance.onLog(e.message);
+                err = [{
+                        status: false,
+                        message: e.message,
+                        statusCode: e.response?.status,
+                        headers: e?.response?.headers,
+                        data: e.response?.data
                     }];
             }
-        }
-        catch (e) {
-            pipeWorksInstance.onLog(e.message);
-            return [{
-                    status: false,
-                    message: e.message,
-                    statusCode: e.response?.status,
-                    headers: e?.response.headers,
-                    data: e.response?.data
-                }];
-        }
+        } while (--retryRemaining > 0);
+        return err;
     }
 }
 exports.ApiTask = ApiTask;

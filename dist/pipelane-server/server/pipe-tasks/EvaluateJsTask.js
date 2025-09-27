@@ -40,15 +40,97 @@ exports.EvaluateJsTask = exports.EvalJSUtils = void 0;
 const axios_1 = __importDefault(require("axios"));
 const fs_1 = __importDefault(require("fs"));
 const pipelane_1 = __importStar(require("pipelane"));
+const crypto_1 = require("crypto");
+const moment_1 = __importDefault(require("moment"));
+//@ts-ignore
+const fast_xml_parser_1 = require("fast-xml-parser");
+const parser = new fast_xml_parser_1.XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: "@_",
+    trimValues: true
+});
 exports.EvalJSUtils = {
+    fs: fs_1.default,
+    getXmlParser() {
+        return parser;
+    },
+    xml2json(xmlText) {
+        return parser.parse(xmlText);
+    },
     mkdir(path) {
         if (!fs_1.default.existsSync(path)) {
-            fs_1.default.mkdirSync(path);
+            fs_1.default.mkdirSync(path, { recursive: true });
         }
     },
     escapeJSONString(str) {
         return str
             .replace(/"/g, '\\"');
+    },
+    randomElement(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    },
+    generateUID(input) {
+        return (0, crypto_1.createHash)("sha256").update(input).digest("hex").substring(0, 10);
+    },
+    extractEnclosedObjString(inputString) {
+        const regex = /\{[^\}]*\}/g;
+        const results = inputString.match(regex);
+        return results[0];
+    },
+    extractCodeFromMarkdown(markdown) {
+        let codeBlocks = [];
+        let regex = /```(.+?)\s*([\s\S]+?)```/gs;
+        let match;
+        while ((match = regex.exec(markdown))) {
+            codeBlocks.push(match[2]);
+        }
+        return codeBlocks;
+    },
+    shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            // Generate a random index between 0 and i (inclusive)
+            const j = Math.floor(Math.random() * (i + 1));
+            // Swap elements at i and j
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    },
+    refineString(str, replacementChar = "_") {
+        const regexPattern = new RegExp(`[^a-zA-Z0-9]`, "g");
+        return str.replace(regexPattern, replacementChar);
+    },
+    generateRandomID(length = 10) {
+        const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let result = "";
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            result += characters.charAt(randomIndex);
+        }
+        return result;
+    },
+    getFileNameFromURL(url) {
+        const parsedURL = new URL(url);
+        const pathname = parsedURL.pathname;
+        const parts = pathname.split("/");
+        const filename = parts[parts.length - 1];
+        return filename;
+    },
+    decodeBase64(base64) {
+        return Buffer.from(base64, "base64").toString("utf8");
+    },
+    getMoment() {
+        return moment_1.default;
+    },
+    formatDate(date, format) {
+        return (0, moment_1.default)(date).format(format);
+    },
+    encodeBase64(normalString) {
+        return Buffer.from(normalString).toString("base64");
+    },
+    async sleep(ms) {
+        return await new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
     }
 };
 /**
@@ -105,7 +187,8 @@ class EvaluateJsTask extends pipelane_1.PipeTask {
         catch (e) {
             return [{
                     status: false,
-                    error: e.message
+                    error: e.message,
+                    stack: JSON.stringify(e.stack || '').substring(0, 100)
                 }];
         }
     }

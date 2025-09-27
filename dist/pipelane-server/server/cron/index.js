@@ -41,25 +41,29 @@ exports.getSecondsUntilNextCronRun = getSecondsUntilNextCronRun;
 //@ts-ignore
 const pipelane_1 = __importDefault(require("pipelane"));
 const model_1 = require("../../gen/model");
-const croner_1 = __importDefault(require("croner"));
+const croner_1 = require("croner");
 const NodeCron = __importStar(require("node-cron"));
-const pipelane_2 = require("../graphql/pipelane");
 const async_lock_1 = __importDefault(require("async-lock"));
 const EvaluateJsTask_1 = require("../pipe-tasks/EvaluateJsTask");
 const axios_1 = __importDefault(require("axios"));
 const fs_1 = require("fs");
-const pipelaneResolver = (0, pipelane_2.generatePipelaneResolvers)(undefined, undefined);
+const utils_1 = require("../graphql/utils");
+// only uncomment for code completions during dev
+// const pipelaneResolver = generatePipelaneResolvers(undefined, undefined)
 class CronScheduler {
     stopped = false;
     cronJobs = [];
     schedules = [];
     currentExecutions = [];
-    pipelaneResolver = pipelaneResolver;
+    executionsCache = [];
+    maxCacheSize = 200;
+    pipelaneResolver; // = pipelaneResolver
     variantConfig;
     pipelaneLogLevel;
-    constructor(variantConfig, pipelaneLogLevel) {
+    constructor(variantConfig, pipelaneLogLevel, maxCacheSize = 200) {
         this.variantConfig = variantConfig;
         this.pipelaneLogLevel = pipelaneLogLevel != undefined ? pipelaneLogLevel : 2;
+        this.maxCacheSize = maxCacheSize;
     }
     async getPipelaneDefinition(pipeName) {
         let pipelane = await this.pipelaneResolver.Query.Pipelane({}, {
@@ -114,7 +118,7 @@ class CronScheduler {
     }
     schedulePipelaneCronjob(pl) {
         let existing = this.findScheduledJob(pl);
-        let cronJob = (0, croner_1.default)(pl.schedule, (() => {
+        let cronJob = new croner_1.Cron(pl.schedule, (() => {
             this.triggerPipelane(pl).catch(e => {
                 console.error(`Fatal error triggering pipelane ${pl.name}. ` + e.message);
             });
@@ -149,7 +153,6 @@ class CronScheduler {
             pipeWorksInstance.logLevel = this.pipelaneLogLevel;
             let pipelaneInstName = `${pl.name}-${Date.now()}`;
             let pipelaneFolderPath = `pipelane/${pipelaneInstName}`;
-            pipeWorksInstance.enableCheckpoints(pipelaneInstName, pipelaneFolderPath);
             let invalidTasksFromSchedule = pl.tasks?.filter(pt => this.variantConfig[pt.taskTypeName] == undefined).map(t => t.taskTypeName);
             if (invalidTasksFromSchedule && invalidTasksFromSchedule.length > 0) {
                 console.warn(`No tasks of types ${invalidTasksFromSchedule.join(",")} found in variantconfig. Skipping triggering ${pl.name}`);
@@ -186,7 +189,8 @@ class CronScheduler {
                 let pltConfig = {
                     uniqueStepName: tkd.name,
                     type: tkd.taskTypeName,
-                    isParallel: tkd.isParallel,
+                    //@ts-ignore
+                    isParallel: tkd.isParallel === true || tkd.isParallel === 'true',
                     numberOfShards: input.numberOfShards,
                     itemsPerShard: input.itemsPerShard,
                     cutoffLoadThreshold: input.cutoffLoadThreshold,
@@ -275,6 +279,9 @@ class CronScheduler {
                 }
             });
             this.listenToPipe(pipeWorksInstance, plx);
+            pipeWorksInstance.instanceId = pipelaneInstName;
+            if (input.resumable)
+                pipeWorksInstance.enableCheckpoints(pipelaneInstName, pipelaneFolderPath);
             pipeWorksInstance.start(input).then(onResult).catch((e) => {
                 console.error(`${pl.name} failed. Retrying. Retry count left: ${retryCountLeft}. Error = ${e.message}`);
                 onResult([{ status: false }]);
@@ -284,6 +291,10 @@ class CronScheduler {
                 }
             });
             this.currentExecutions.push(pipeWorksInstance);
+            this.executionsCache.push(pipeWorksInstance);
+            if (this.executionsCache.length > this.maxCacheSize) {
+                this.executionsCache.shift();
+            }
             return plx;
         }
         return undefined;
@@ -294,7 +305,7 @@ class CronScheduler {
             this.lock.acquire(plx.id, (async () => {
                 if (event == 'NEW_TASK') {
                     let taskName = task.uniqueStepName || task.variantType || task.type;
-                    let taskId = `${plx.id}::${taskName}`;
+                    let taskId = `${plx.id}::${task.variantType}::${taskName}`;
                     await this.pipelaneResolver.Mutation.createPipelaneTaskExecution({}, {
                         //@ts-ignore
                         data: {
@@ -312,8 +323,8 @@ class CronScheduler {
                 }
                 else if (event == 'TASK_FINISHED' || event == 'SKIPPED') {
                     let taskName = task.uniqueStepName || task.variantType;
-                    let taskId = `${plx.id}::${taskName}`;
-                    let status = this.mapStatus(event, output);
+                    let taskId = `${plx.id}::${task.variantType}::${taskName}`;
+                    let status = (0, utils_1.mapStatus)(event, output);
                     const jsonStr = JSON.stringify(output);
                     await this.pipelaneResolver.Mutation.createPipelaneTaskExecution({}, {
                         //@ts-ignore
@@ -334,7 +345,7 @@ class CronScheduler {
                             data: {
                                 id: taskId,
                                 endTime: `${Date.now()}`,
-                                status: this.mapStatus(event, output),
+                                status: (0, utils_1.mapStatus)(event, output),
                                 output: base64op
                             }
                         }).catch(async (e) => {
@@ -344,7 +355,7 @@ class CronScheduler {
                                 data: {
                                     id: taskId,
                                     endTime: `${Date.now()}`,
-                                    status: this.mapStatus(event, output),
+                                    status: (0, utils_1.mapStatus)(event, output),
                                     output: 'Unsupported Output'
                                 }
                             }).catch(e => {
@@ -366,20 +377,6 @@ class CronScheduler {
         }).bind(this);
         pipelaneInstance.setListener(pipelaneListener);
     }
-    mapStatus(event, output) {
-        if (event == 'SKIPPED')
-            return model_1.Status.Skipped;
-        let isAtleaseOneFail = (output || []).find(o => !o.status);
-        let isAtleaseOneSuccess = (output || []).find(o => o.status);
-        let status = model_1.Status.Success;
-        if (isAtleaseOneFail) {
-            status = model_1.Status.PartialSuccess;
-        }
-        if (!isAtleaseOneSuccess) {
-            status = model_1.Status.Failed;
-        }
-        return status;
-    }
     validateCronString(cronString) {
         return NodeCron.validate(cronString);
     }
@@ -388,7 +385,7 @@ class CronScheduler {
         const adjustedTimestamp = new Date(timestamp.getTime() - 1000);
         const timeZone = ['Asia/Calcutta', 'Asia/Kolkata']
             .includes(Intl.DateTimeFormat().resolvedOptions().timeZone) ? undefined : 'Asia/Kolkata';
-        const cronJob = new croner_1.default(cronExpression, {
+        const cronJob = new croner_1.Cron(cronExpression, {
             timezone: timeZone
         });
         const nextRunTime = cronJob.nextRun(adjustedTimestamp);
@@ -400,7 +397,7 @@ class CronScheduler {
             return;
         }
         let runningPipe = this.currentExecutions.find(ex => `${ex.name}`.startsWith(schedule.name));
-        return runningPipe == undefined && !runningPipe.isRunning;
+        return runningPipe == undefined || !runningPipe.isRunning;
     }
 }
 exports.CronScheduler = CronScheduler;
@@ -411,7 +408,7 @@ exports.CronScheduler = CronScheduler;
  */
 function getSecondsUntilNextCronRun(cronExpression, timestamp = new Date()) {
     const adjustedTimestamp = new Date(timestamp.getTime() - 1000);
-    const cronJob = new croner_1.default(cronExpression, {
+    const cronJob = new croner_1.Cron(cronExpression, {
         timezone: 'Asia/Kolkata'
     });
     const nextRunTime = cronJob.nextRun(adjustedTimestamp);

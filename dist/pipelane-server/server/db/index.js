@@ -73,7 +73,9 @@ function initialzeDb(db, mysqlConfig) {
         db.create(exports.TableName.PS_PIPELANE_TASK_EXEC, pltx),
         db.create(exports.TableName.PS_PIPELANE_META, plm),
     ];
-    Promise.all(tablePromises).then(() => console.log('pipelane:DB Initialized: ', tablePromises.length, 'tables'));
+    Promise.all(tablePromises).then(() => console.log('pipelane:DB Initialized: ', tablePromises.length, 'tables')).catch(e => {
+        console.error('pipelane:DB Init Error', e.message);
+    });
     function clean() {
         db.delete(exports.TableName.PS_PIPELANE_EXEC, {});
         db.delete(exports.TableName.PS_PIPELANE_TASK_EXEC, {});

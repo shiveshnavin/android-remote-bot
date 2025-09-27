@@ -74,7 +74,8 @@ export type Mutation = {
     createPipelaneTaskExecution: PipetaskExecution;
     deletePipelane: Status;
     deletePipelaneTask: Status;
-    executePipelane: PipetaskExecution;
+    executePipelane: PipelaneExecution;
+    stopPipelane: PipelaneExecution;
 };
 export type MutationClonePipelaneArgs = {
     name: Scalars['ID']['input'];
@@ -103,6 +104,9 @@ export type MutationDeletePipelaneTaskArgs = {
 export type MutationExecutePipelaneArgs = {
     input?: InputMaybe<Scalars['String']['input']>;
     name: Scalars['ID']['input'];
+};
+export type MutationStopPipelaneArgs = {
+    id: Scalars['ID']['input'];
 };
 export type Pipelane = {
     __typename?: 'Pipelane';

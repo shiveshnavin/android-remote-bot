@@ -4,6 +4,7 @@ exports.generatePipelaneResolvers = generatePipelaneResolvers;
 const model_1 = require("../../gen/model");
 const db_1 = require("../db");
 const graphql_1 = require("graphql");
+const utils_1 = require("./utils");
 function generateString() {
     const hours = new Date().getHours().toString().padStart(2, '0');
     const minutes = new Date().getMinutes().toString().padStart(2, '0');
@@ -13,6 +14,9 @@ function generateString() {
     return generatedString;
 }
 function generatePipelaneResolvers(db, variantConfig, cronScheduler, defaultExecutionRetentionCountPerPipe = 5) {
+    if (db == undefined) {
+        throw new Error('db supplied to pipelane must not be null');
+    }
     async function trimExecution(pipeEx) {
         let pipe = await PipelaneResolvers.Query.Pipelane(undefined, {
             name: pipeEx.name
@@ -87,6 +91,13 @@ function generatePipelaneResolvers(db, variantConfig, cronScheduler, defaultExec
             tasks: async (parent) => {
                 if (parent.tasks)
                     return parent.tasks;
+                let cached = cronScheduler.executionsCache.find(ex => ex.instanceId === parent.id);
+                if (cached) {
+                    //@ts-ignore
+                    let tasks = (0, utils_1.getTasksExecFromPipelane)(cached);
+                    if (tasks && tasks.length > 0)
+                        return tasks;
+                }
                 let tasks = await db.get(db_1.TableName.PS_PIPELANE_TASK_EXEC, {
                     pipelaneExId: parent.id
                 }, {
@@ -240,7 +251,7 @@ function generatePipelaneResolvers(db, variantConfig, cronScheduler, defaultExec
                     }, existing);
                 else {
                     let existingTasks = await PipelaneResolvers.Pipelane.tasks({ name: input.pipelaneName }) || [];
-                    existing.step = existingTasks.length;
+                    existing.step = existing.step ?? existingTasks.length;
                     await db.insert(db_1.TableName.PS_PIPELANE_TASK, existing);
                 }
                 return existing;
@@ -355,11 +366,24 @@ function generatePipelaneResolvers(db, variantConfig, cronScheduler, defaultExec
             },
             async executePipelane(parent, request) {
                 let existing = await PipelaneResolvers.Query.Pipelane(parent, request);
-                let execution = await cronScheduler.triggerPipelane(existing, request.input || existing.input);
+                let execution = await cronScheduler.triggerPipelane(existing, JSON.stringify(Object.assign(JSON.parse(existing.input), JSON.parse(request.input))));
                 if (!execution) {
                     throw new graphql_1.GraphQLError("Error triggering pipelane, perhaps it is disabled?");
                 }
                 return execution;
+            },
+            async stopPipelane(parent, request) {
+                let cached = cronScheduler.executionsCache.find(ex => ex.instanceId === request.id);
+                if (cached) {
+                    cached.stop();
+                    let plx = await db.getOne(db_1.TableName.PS_PIPELANE_EXEC, { id: request.id });
+                    plx.status = model_1.Status.Skipped;
+                    await db.update(db_1.TableName.PS_PIPELANE_EXEC, { id: request.id }, plx);
+                    return plx;
+                }
+                else {
+                    throw new graphql_1.GraphQLError("Pipelane execution not found. Perhaps its already terminated.");
+                }
             },
         }
     };

@@ -5,7 +5,7 @@ import { CronScheduler } from "../cron";
 export declare function generatePipelaneResolvers(db: MultiDbORM, variantConfig: TaskVariantConfig, cronScheduler?: CronScheduler, defaultExecutionRetentionCountPerPipe?: number): {
     PipelaneExecution: {
         definition: (parent: any) => Promise<Pipetask>;
-        tasks: (parent: any) => Promise<any>;
+        tasks: (parent: PipelaneExecution) => Promise<any[]>;
     };
     Pipetask: {
         active: (parent: any) => any;
@@ -26,7 +26,7 @@ export declare function generatePipelaneResolvers(db: MultiDbORM, variantConfig:
         executions(parent: any, request: {
             limit: number;
         }): Promise<any[]>;
-        pipelaneExecutions(pr: any, arg: QueryPipelaneExecutionsArgs): Promise<any[]>;
+        pipelaneExecutions(pr: any, arg: QueryPipelaneExecutionsArgs): Promise<PipelaneExecution[]>;
     };
     Mutation: {
         createPipelaneTask(parent: any, request: MutationCreatePipelaneTaskArgs): Promise<Pipetask>;
@@ -48,6 +48,9 @@ export declare function generatePipelaneResolvers(db: MultiDbORM, variantConfig:
         executePipelane(parent: any, request: {
             name: string;
             input: string;
+        }): Promise<PipelaneExecution>;
+        stopPipelane(parent: any, request: {
+            id: string;
         }): Promise<PipelaneExecution>;
     };
 };

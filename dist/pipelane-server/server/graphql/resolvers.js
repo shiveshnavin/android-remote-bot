@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateResolvers = generateResolvers;
-const tasktypes_1 = require("./tasktypes");
+const utils_1 = require("./utils");
 const pipelane_1 = require("./pipelane");
 const lodash_1 = __importDefault(require("lodash"));
 function generateResolvers(db, variantConfig, cronScheduler) {
     const resolvers = [
-        (0, tasktypes_1.generateTaskTypeResolvers)(variantConfig),
+        (0, utils_1.generateTaskTypeResolvers)(variantConfig),
         (0, pipelane_1.generatePipelaneResolvers)(db, variantConfig, cronScheduler)
     ];
     let resolver = {};

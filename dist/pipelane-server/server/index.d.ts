@@ -5,7 +5,7 @@ export declare function creatPipelaneServer(variantConfig: TaskVariantConfig, pe
 declare let dummyResolver: {
     PipelaneExecution: {
         definition: (parent: any) => Promise<import("../gen/model").Pipetask>;
-        tasks: (parent: any) => Promise<any>;
+        tasks: (parent: import("../gen/model").PipelaneExecution) => Promise<any[]>;
     };
     Pipetask: {
         active: (parent: any) => any;
@@ -26,7 +26,7 @@ declare let dummyResolver: {
         executions(parent: any, request: {
             limit: number;
         }): Promise<any[]>;
-        pipelaneExecutions(pr: any, arg: import("../gen/model").QueryPipelaneExecutionsArgs): Promise<any[]>;
+        pipelaneExecutions(pr: any, arg: import("../gen/model").QueryPipelaneExecutionsArgs): Promise<import("../gen/model").PipelaneExecution[]>;
     };
     Mutation: {
         createPipelaneTask(parent: any, request: import("../gen/model").MutationCreatePipelaneTaskArgs): Promise<import("../gen/model").Pipetask>;
@@ -48,6 +48,9 @@ declare let dummyResolver: {
         executePipelane(parent: any, request: {
             name: string;
             input: string;
+        }): Promise<import("../gen/model").PipelaneExecution>;
+        stopPipelane(parent: any, request: {
+            id: string;
         }): Promise<import("../gen/model").PipelaneExecution>;
     };
 };

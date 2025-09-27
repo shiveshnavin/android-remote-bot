@@ -3,16 +3,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WriteFileTask = void 0;
+exports.WriteCsvFileTask = void 0;
 //@ts-ignore
 const pipelane_1 = require("pipelane");
 const fs_1 = __importDefault(require("fs"));
 const json2csv_1 = require("json2csv");
-class WriteFileTask extends pipelane_1.PipeTask {
-    static TASK_VARIANT_NAME = "write-file";
+class WriteCsvFileTask extends pipelane_1.PipeTask {
     static TASK_TYPE_NAME = "write-file";
+    static TASK_VARIANT_NAME = "csv";
     constructor(variantName) {
-        super(WriteFileTask.TASK_TYPE_NAME, variantName || WriteFileTask.TASK_VARIANT_NAME);
+        super(WriteCsvFileTask.TASK_TYPE_NAME, variantName || WriteCsvFileTask.TASK_VARIANT_NAME);
     }
     kill() {
         return true;
@@ -56,4 +56,4 @@ class WriteFileTask extends pipelane_1.PipeTask {
             }];
     }
 }
-exports.WriteFileTask = WriteFileTask;
+exports.WriteCsvFileTask = WriteCsvFileTask;

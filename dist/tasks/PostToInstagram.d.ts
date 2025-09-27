@@ -26,7 +26,7 @@ export declare class PostToInstagram extends PipeTask<any, any> {
     static TASK_VARIANT_NAME: string;
     static TASK_TYPE_NAME: string;
     bot: AndroidBot;
-    constructor();
+    constructor(bot?: AndroidBot);
     kill(): boolean;
     describe(): PipeTaskDescription | undefined;
     posted: any[];
