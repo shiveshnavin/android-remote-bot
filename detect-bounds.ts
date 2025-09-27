@@ -41,13 +41,15 @@ export async function detectBounds(boundsStr: string, markedTargetFile?: string)
     const dumpPath = join(workspaceDir, "dump.png");
     const markedPath = resolve(markedTargetFile ?? join(workspaceDir, "dump_marked.png"));
 
-    // Step 1: adb screenshot → dump.png
+    console.log("Capturing screenshot...");
+    // Step 1: adb → dump.png
     const { stdout } = await execFileAsync("adb", ["exec-out", "screencap", "-p"], {
         encoding: "buffer",
         maxBuffer: 1024 * 1024 * 64
     });
     writeFileSync(dumpPath, stdout);
 
+    console.log("Marking bounds with ffmpeg...");
     // Step 2: ffmpeg → dump_marked.png
     const vf = mkDrawBoxFilter(b);
     await new Promise<void>((resolvePromise, reject) => {
