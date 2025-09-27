@@ -532,7 +532,7 @@ export class AndroidBot {
     }
   }
 
-  async captureBounds(node: Node, targetFile?: string) {
+  async dumpMarkBounds(node: Node, targetFile?: string) {
     let bounds = node.$.bounds;
     try {
       targetFile = await detectBounds(bounds, targetFile);
