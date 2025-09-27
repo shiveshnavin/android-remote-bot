@@ -35,6 +35,7 @@ export declare class AndroidBot {
      * @param timeout
      */
     waitFor(runnable: () => Promise<any>, timeout: number, pollInterval?: number, label?: string): Promise<any>;
+    findElementByResId(resId: string, screenJson?: any): Promise<Node>;
     findElementByAttribute(attr: string, value: string, screenJson?: any): Promise<Node>;
     findElementByLabel(label: string, screenJson?: any): Promise<Node>;
     clickAndHoldNode(node: Node, durationMs: number): Promise<void>;
@@ -42,7 +43,7 @@ export declare class AndroidBot {
     clickAndHold(x: number, y: number, durationMs: number): Promise<any>;
     clickAt(x: number, y: number): Promise<any>;
     dumpScreenXml(dumpFile?: string): Promise<any>;
-    captureBounds(node: Node, targetFile?: string): Promise<void>;
+    dumpMarkBounds(node: Node, targetFile?: string): Promise<string>;
     /**
      *
      * @param packageName package name

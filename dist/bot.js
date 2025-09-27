@@ -404,6 +404,19 @@ class AndroidBot {
         throw new Error(`waitFor timed out after ${timeout}ms`);
     }
     // Find element by attribute
+    async findElementByResId(resId, screenJson) {
+        const xml = new xml_1.XmlUtils();
+        if (!screenJson) {
+            screenJson = await this.dumpScreenXml();
+        }
+        xml.xmlJson = screenJson;
+        const node = await xml.findNodeByAttr("resource-id", resId);
+        if (node) {
+            console.log("Found node", `resource-id=${resId}`, '@', node.$.bounds);
+            return node;
+        }
+    }
+    // Find element by attribute
     async findElementByAttribute(attr, value, screenJson) {
         const xml = new xml_1.XmlUtils();
         if (!screenJson) {
@@ -489,11 +502,12 @@ class AndroidBot {
             throw error;
         }
     }
-    async captureBounds(node, targetFile) {
+    async dumpMarkBounds(node, targetFile) {
         let bounds = node.$.bounds;
         try {
             targetFile = await (0, detect_bounds_1.detectBounds)(bounds, targetFile);
             console.log("Captured", bounds, "bounds to ", targetFile);
+            return targetFile;
         }
         catch (error) {
             console.error("Failed to capture bounds:", error);

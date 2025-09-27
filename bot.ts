@@ -440,6 +440,23 @@ export class AndroidBot {
 
 
   // Find element by attribute
+  async findElementByResId(
+    resId: string,
+    screenJson?: any
+  ): Promise<Node> {
+    const xml = new XmlUtils();
+    if (!screenJson) {
+      screenJson = await this.dumpScreenXml();
+    }
+    xml.xmlJson = screenJson;
+    const node = await xml.findNodeByAttr("resource-id", resId);
+    if (node) {
+      console.log("Found node", `resource-id=${resId}`, '@', node.$.bounds);
+      return node;
+    }
+  }
+
+  // Find element by attribute
   async findElementByAttribute(
     attr: string,
     value: string,
@@ -537,6 +554,7 @@ export class AndroidBot {
     try {
       targetFile = await detectBounds(bounds, targetFile);
       console.log("Captured", bounds, "bounds to ", targetFile);
+      return targetFile;
     } catch (error) {
       console.error("Failed to capture bounds:", error);
       throw error;
