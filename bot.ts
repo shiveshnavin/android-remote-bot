@@ -603,7 +603,7 @@ export class AndroidBot {
 
   async enableApp(packageName: string) {
     try {
-      const command = `adb shell pm enable ${packageName}`;
+      const command = `adb shell su -c "pm enable-user --user 0 ${packageName}"`;
       await this.executeCommand(command);
       console.log(`App ${packageName} enabled successfully.`);
     } catch (error) {
@@ -614,7 +614,7 @@ export class AndroidBot {
 
   async disableApp(packageName: string) {
     try {
-      const command = `adb shell pm disable ${packageName}`;
+      const command = `adb shell su -c "pm disable-user --user 0 ${packageName}"`;
       await this.executeCommand(command);
       console.log(`App ${packageName} disabled successfully.`);
     } catch (error) {
