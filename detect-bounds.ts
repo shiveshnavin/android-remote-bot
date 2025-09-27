@@ -53,7 +53,9 @@ export async function detectBounds(boundsStr: string, markedTargetFile?: string)
     // Step 2: ffmpeg → dump_marked.png
     const vf = mkDrawBoxFilter(b);
     await new Promise<void>((resolvePromise, reject) => {
-        const ff = spawn("ffmpeg", ["-y", "-i", dumpPath, "-vf", vf, markedPath], { stdio: "inherit" });
+        const ff = spawn("ffmpeg", ["-y", "-i", dumpPath, "-vf", vf, markedPath]
+            // , { stdio: "inherit" }
+        );
         ff.on("error", reject);
         ff.on("close", (code) => {
             if (code === 0) resolvePromise();
