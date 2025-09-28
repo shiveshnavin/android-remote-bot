@@ -12,7 +12,16 @@ const fs_1 = __importDefault(require("fs"));
 const mcp_1 = require("./server/mcp");
 const app = (0, express_1.default)();
 const port = process.env.PORT || 4001;
-const db = new multi_db_orm_1.SQLiteDB('database.sqlite');
+function initDb() {
+    try {
+        return new multi_db_orm_1.SQLiteDB('database.sqlite');
+    }
+    catch (e) {
+        console.error("SQLite DB Initialization failed, did you install `npm i sqlite3`?");
+        throw e;
+    }
+}
+const db = initDb();
 app.use((0, mcp_1.createMcpServer)(pipe_tasks_1.VariantConfig, db));
 (0, server_1.creatPipelaneServer)(pipe_tasks_1.VariantConfig, db, 2).then(pipelane => {
     app.use('/pipelane', pipelane);

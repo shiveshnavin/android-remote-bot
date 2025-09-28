@@ -39,6 +39,12 @@ export declare function generatePipelaneResolvers(db: MultiDbORM, variantConfig:
             name: string;
             pipelaneName: string;
         }): Promise<string>;
+        /**
+         * Called every time regardless via GraphQL (executePipelane) or Cron
+         * @param parent
+         * @param request
+         * @returns
+         */
         createPipelaneExecution(parent: any, request: {
             data: PipelaneExecution;
         }): Promise<any>;

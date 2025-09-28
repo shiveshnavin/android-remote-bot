@@ -1,4 +1,5 @@
-cd pipelane-server 
+rm -rf precompiled-ui-dist || true
+cd pipelane-server
+npm run gen 
 npm run build
-cd ../
-sh copy-files.sh
+mv client/dist ../precompiled-ui-dist

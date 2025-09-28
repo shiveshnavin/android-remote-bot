@@ -65,15 +65,15 @@ class CronScheduler {
         this.pipelaneLogLevel = pipelaneLogLevel != undefined ? pipelaneLogLevel : 2;
         this.maxCacheSize = maxCacheSize;
     }
-    async getPipelaneDefinition(pipeName) {
-        let pipelane = await this.pipelaneResolver.Query.Pipelane({}, {
+    async getPipelaneDefinition(pipeName, existing) {
+        let pipelane = existing || (await this.pipelaneResolver.Query.Pipelane({}, {
             name: pipeName
-        });
+        }));
         if (!pipelane)
             return undefined;
-        pipelane.tasks = await this.pipelaneResolver.Query.pipelaneTasks({}, {
+        pipelane.tasks = existing.tasks || (await this.pipelaneResolver.Query.pipelaneTasks({}, {
             pipelaneName: pipeName
-        }) || [];
+        })) || [];
         return pipelane;
     }
     init(initialSchedules, pipelaneResolver) {
@@ -139,7 +139,7 @@ class CronScheduler {
             console.warn(`Executor is stopped, skip triggering ${pl.name}`);
             return;
         }
-        let pipelaneBluePrint = await this.getPipelaneDefinition(pl.name);
+        let pipelaneBluePrint = await this.getPipelaneDefinition(pl.name, pl);
         if (!pipelaneBluePrint) {
             console.warn(`No definition found for ${pl.name}`);
             return;
@@ -225,7 +225,7 @@ class CronScheduler {
                 if (output == undefined || output[0].status == false) {
                     if (retryCountLeft-- > 0) {
                         if (this.pipelaneLogLevel > 0)
-                            console.warn(`Pipe:${pl.name} failed. Retrying. Retry count left: ${retryCountLeft}`);
+                            console.warn(`[pipelane-server] ${pl.name} failed. Retrying. Retry count left: ${retryCountLeft}`);
                         //@ts-ignore
                         pipeWorksInstance.currentTaskIdx = 0;
                         //@ts-ignore
@@ -235,13 +235,13 @@ class CronScheduler {
                     }
                     else {
                         if (this.pipelaneLogLevel > 0)
-                            console.log(`Pipe:${pl.name} failed`);
+                            console.log(`[pipelane-server] ${pl.name} failed`);
                         status = model_1.Status.Failed;
                     }
                 }
                 else {
                     if (this.pipelaneLogLevel > 0)
-                        console.log(`Pipe:${pl.name} success`);
+                        console.log(`[pipelane-server] ${pl.name} success`);
                     status = model_1.Status.Success;
                 }
                 this.pipelaneResolver.Mutation.createPipelaneExecution({}, {

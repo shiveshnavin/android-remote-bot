@@ -1,5 +1,5 @@
 {
-  "name": "bot",
+  "name": "android-bot",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -7,6 +7,7 @@
     "start:remote": "PORT=4041 node dist/server.js",
     "serve": "ts-node-dev --transpile-only server.ts",
     "build": "rm -rf dist && tsc || sh copy-files.sh",
+    "build:full": "sh build.sh && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

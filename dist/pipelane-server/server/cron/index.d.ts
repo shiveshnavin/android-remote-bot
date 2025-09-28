@@ -15,7 +15,7 @@ export declare class CronScheduler {
     variantConfig: TaskVariantConfig;
     pipelaneLogLevel: 0 | 1 | 2 | 3 | 4 | 5;
     constructor(variantConfig: TaskVariantConfig, pipelaneLogLevel?: 0 | 1 | 2 | 3 | 4 | 5, maxCacheSize?: number);
-    getPipelaneDefinition(pipeName: any): Promise<PipelaneSchedule | undefined>;
+    getPipelaneDefinition(pipeName: string, existing?: PipelaneSchedule): Promise<PipelaneSchedule | undefined>;
     init(initialSchedules: PipelaneSchedule[], pipelaneResolver: any): void;
     stopJob(name: String): void;
     stopAll(): void;
