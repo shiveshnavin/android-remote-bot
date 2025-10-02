@@ -330,8 +330,10 @@ export class AndroidBot {
     const command = `adb shell input keyevent ${keyEvents}`;
     await this.executeCommand(command);
   }
-  async typeText(text: string): Promise<string> {
-    return this.typeTextViaPaste(text);
+
+  async typeText(text: string, typeNormally = false): Promise<string> {
+    if (!typeNormally)
+      return this.typeTextViaPaste(text);
     try {
       const parts = text.split(/(\n|\t|\[|\]|\{|\}|\(|\)| |#)/);
       let result = '';

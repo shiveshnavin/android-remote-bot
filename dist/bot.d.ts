@@ -26,7 +26,7 @@ export declare class AndroidBot {
     dismissBottomSheetIfPresent(screenJson: any): Promise<void>;
     clickAtTopCenter(): Promise<void>;
     clearInputField(strokes: number): Promise<void>;
-    typeText(text: string): Promise<string>;
+    typeText(text: string, typeNormally?: boolean): Promise<string>;
     typeTextCleaned(text: string): Promise<string>;
     typeTextViaPaste(text?: string): Promise<string>;
     /**
