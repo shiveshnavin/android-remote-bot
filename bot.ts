@@ -552,6 +552,14 @@ export class AndroidBot {
     }
   }
 
+  async dumpScreen(targetFile?: string): Promise<string> {
+    const dumpPath = path.resolve(targetFile ?? path.join(wsdir, "dump.png"));
+    await this.executeCommand(`adb exec-out screencap -p > ${dumpPath}`);
+    console.log("Dumped screen to", dumpPath);
+    return dumpPath;
+  }
+
+
   async dumpMarkBounds(node: Node, targetFile?: string) {
     let bounds = node.$.bounds;
     try {

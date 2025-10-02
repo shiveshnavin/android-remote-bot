@@ -1,6 +1,7 @@
 node_modules/
 .vscode/
 workspace/
+traces/
 dump.xml
 sftp-config.json
 .env
