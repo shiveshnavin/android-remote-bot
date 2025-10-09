@@ -71,7 +71,7 @@ export class AndroidBot {
   // Method to hide keyboard if it's visible
   async hideKeyboardIfVisible(tryHideKeyboardTries = 0): Promise<void> {
     try {
-      let keyboardVisible = await this.isKeyboardVisible(); 
+      let keyboardVisible = await this.isKeyboardVisible();
       if (!keyboardVisible) {
         console.log("Keyboard is not visible.");
       }
@@ -82,7 +82,7 @@ export class AndroidBot {
         if (await this.isKeyboardVisible()) {
           await this.executeCommand("adb shell input keyevent KEYCODE_BACK");
         }
-        keyboardVisible = await this.isKeyboardVisible(); 
+        keyboardVisible = await this.isKeyboardVisible();
 
       }
     } catch (error) {
@@ -161,6 +161,12 @@ export class AndroidBot {
   // Method to simulate enter key press
   async pressEnterKey(): Promise<void> {
     const command = "adb shell input keyevent 66";
+    await this.executeCommand(command);
+  }
+
+  async pressKey(code: string, strokes: number = 1): Promise<void> {
+    const keyEvents = Array(strokes).fill(code).join(" ");
+    const command = "adb shell input keyevent " + keyEvents;
     await this.executeCommand(command);
   }
 

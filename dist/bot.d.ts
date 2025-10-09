@@ -13,6 +13,7 @@ export declare class AndroidBot {
     getMediaIdFromPath(filePath: string): Promise<string>;
     pressBackKey(strokes?: number): Promise<void>;
     pressEnterKey(): Promise<void>;
+    pressKey(code: string, strokes?: number): Promise<void>;
     sleep(ms: number): Promise<void>;
     swipe(x1: number, y1: number, x2: number, y2: number, duration?: number): Promise<void>;
     getScreenResolution(): Promise<{

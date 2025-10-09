@@ -152,6 +152,11 @@ class AndroidBot {
         const command = "adb shell input keyevent 66";
         await this.executeCommand(command);
     }
+    async pressKey(code, strokes = 1) {
+        const keyEvents = Array(strokes).fill(code).join(" ");
+        const command = "adb shell input keyevent " + keyEvents;
+        await this.executeCommand(command);
+    }
     // Sleep method
     async sleep(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
