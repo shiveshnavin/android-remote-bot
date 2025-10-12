@@ -1,5 +1,5 @@
 import { MultiDbORM } from "multi-db-orm";
-import PipeLane, { PipeTask, PipeTaskDescription } from "pipelane";
+import PipeLane, { InputWithPreviousInputs, PipeTask, PipeTaskDescription, OutputWithStatus } from "pipelane";
 export type Topic = {
     id: string;
     priority: number;
@@ -8,7 +8,7 @@ export type Topic = {
     createdTimestamp: number;
     queue: string;
 };
-export declare class TopicTask extends PipeTask<any, any> {
+export declare class TopicTask extends PipeTask<InputWithPreviousInputs, OutputWithStatus> {
     kill(): boolean;
     static TASK_TYPE_NAME: string;
     static VARIANT_READ: string;
