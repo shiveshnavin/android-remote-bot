@@ -95,13 +95,52 @@ async function igEnterCaptionAndPost(caption) {
     await bot.hideKeyboardIfVisible();
     await bot.sleep(2000);
     screenJson = await bot.dumpScreenXml();
-    let shareBtn = await bot.findElementByAttribute("resource-id", "com.instagram.android:id/share_button", screenJson);
-    let moreOptions = await bot.findElementByLabel("Share", screenJson);
-    // let moreOptions = await bot.findElementByLabel("Save Draft", screenJson);
-    if (moreOptions)
-        await bot.clickNode(moreOptions);
-    if (shareBtn)
-        await bot.clickNode(shareBtn);
+    let shareBtn;
+    let shared = false;
+    if (!shared) {
+        shareBtn = await bot.waitFor(() => (bot.findElementByAttribute("resource-id", "com.instagram.android:id/share_button")), 5000, 1000, 'share button').catch(e => {
+            console.log("Error finding share button:", e.message);
+            return null;
+        });
+        if (shareBtn) {
+            await bot.clickNode(shareBtn);
+            await bot.sleep(1000);
+            await bot.clickNode(shareBtn);
+            shared = true;
+        }
+        let shareBtnByLabel = await bot.waitFor(() => (bot.findElementByLabel("Share")), 5000, 1000, 'share button by label').catch(e => {
+            console.log("Error finding share button by label:", e.message);
+            return null;
+        });
+        if (shareBtnByLabel) {
+            await bot.clickNode(shareBtnByLabel);
+            await bot.sleep(1000);
+            await bot.clickNode(shareBtnByLabel);
+            shared = true;
+        }
+    }
+    if (!shared) {
+        let nextBtn = await bot.waitFor(() => (bot.findElementByLabel("Next")), 5000, 1000, 'next btn button').catch(e => {
+            console.log("Error finding next button:", e.message);
+            return null;
+        });
+        if (nextBtn) {
+            await bot.clickNode(nextBtn);
+            shareBtn = await bot.waitFor(() => (bot.findElementByLabel("Share")), 5000, 1000, 'share button').catch(e => {
+                console.log("Error finding share button:", e.message);
+                return null;
+            });
+            if (shareBtn) {
+                await bot.clickNode(shareBtn);
+                await bot.sleep(1000);
+                await bot.clickNode(shareBtn);
+                shared = true;
+            }
+        }
+    }
+    if (!shared) {
+        throw new Error("Unable to find share button, post not shared");
+    }
     console.log("Waiting for 5sec for Instagram to finish upload");
     await bot.sleep(5000);
     await bot.pressBackKey(5);

@@ -48,7 +48,7 @@ class XmlUtils {
   }
 
   // Find the node with the given label in the 'text' attribute
-  async findNodeByLabel(label: string): Promise<Node | null> {
+  async findNodeByLabel(label: string, strict = false): Promise<Node | null> {
     // Parse the XML before searching
     if (!this.xmlJson) {
       await this.parseXml();
@@ -62,9 +62,25 @@ class XmlUtils {
       if (!node) {
         return null
       }
-      // Check if the 'text' attribute matches the label
-      if (node.$ && node.$.text && node.$.text.includes(label)) {
-        return node;
+      if (strict) {
+        // Check if the 'text' attribute matches the label exactly
+        if (node.$ && node.$.text && node.$.text === label) {
+          return node;
+        }
+        // Check if the 'content-desc' attribute matches the label exactly
+        if (node.$ && node.$['content-desc'] && node.$['content-desc'] === label) {
+          return node;
+        }
+      }
+      else {
+        // Check if the 'text' attribute matches the label
+        if (node.$ && node.$.text && node.$.text.includes(label)) {
+          return node;
+        }
+        // Check if the 'content-desc' attribute matches the label
+        if (node.$ && node.$['content-desc'] && node.$['content-desc'].includes(label)) {
+          return node;
+        }
       }
 
       // Recursively search through child nodes if they exist

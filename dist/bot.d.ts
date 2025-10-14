@@ -46,6 +46,7 @@ export declare class AndroidBot {
     dumpScreenXml(dumpFile?: string): Promise<any>;
     dumpScreen(targetFile?: string): Promise<string>;
     dumpMarkBounds(node: Node, targetFile?: string): Promise<string>;
+    disableAnimations(): Promise<void>;
     /**
      *
      * @param packageName package name
@@ -64,5 +65,5 @@ export declare class AndroidBot {
     wakeup(): Promise<void>;
     turnOffScreen(): Promise<void>;
     isScreenOn(): Promise<boolean>;
-    executeCommand(command: string): Promise<string>;
+    executeCommand(command: string, logOutput?: boolean): Promise<string>;
 }

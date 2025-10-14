@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostToInstagram = void 0;
 const pipelane_1 = require("pipelane");
+const fs_1 = require("fs");
 const bot_1 = require("../bot");
 const __1 = require("..");
 const axios_1 = __importDefault(require("axios"));
@@ -92,15 +93,20 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 this.onLog(fileName, 'downloading to local:', localFile);
                 this.onLog('Posting start: ', caption);
                 await (bot.executeCommand(downloadCmd).catch(e => { }));
+                if (!(0, fs_1.existsSync)(localFile) || (0, fs_1.statSync)(localFile).size < 100) {
+                    throw new Error(`File not downloaded. ${localFile} is empty. Is the file deleted from remote?`);
+                }
                 this.onLog(localFile, 'pushing to device:', targetFile);
                 await bot.executeCommand(`adb push ${localFile} ${targetFile}`);
                 await bot.scanFile(targetFile);
                 await bot.setVolumeToZero();
                 await bot.startCopyClip();
                 await bot.pressBackKey(5);
+                await bot.disableAnimations();
                 if (model.tenant) {
                     await bot.openActivity("com.instagram.android/com.instagram.android.activity.MainTabActivity");
                     await bot.sleep(5000);
+                    this.onLog("Switching profile to ", model.tenant);
                     await (0, __1.switchProfile)(model.tenant);
                 }
                 await (0, __1.shareFile)(targetFile, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity");

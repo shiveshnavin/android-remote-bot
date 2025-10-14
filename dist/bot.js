@@ -497,8 +497,8 @@ class AndroidBot {
     async dumpScreenXml(dumpFile) {
         try {
             let _tempDump = "/sdcard/window_dump.xml";
-            await this.executeCommand(`adb shell su -c "uiautomator dump ${_tempDump}"`);
-            console.log("Dumped screen to xml");
+            // await this.executeCommand(`adb shell su -c "uiautomator dump ${_tempDump}"`, true);
+            await this.executeCommand(`adb shell "uiautomator dump ${_tempDump}"`, true);
             const xmlContent = await this.executeCommand("adb shell cat " + _tempDump);
             console.log("Size of xml:", xmlContent.length, "bytes");
             await this.executeCommand("adb shell rm " + _tempDump);
@@ -526,6 +526,19 @@ class AndroidBot {
         }
         catch (error) {
             console.error("Failed to capture bounds:", error);
+            throw error;
+        }
+    }
+    async disableAnimations() {
+        try {
+            await this.executeCommand(`adb shell su -c "settings put global window_animation_scale 0"`);
+            await this.executeCommand(`adb shell su -c "settings put global transition_animation_scale 0"`);
+            await this.executeCommand(`adb shell su -c "settings put global animator_duration_scale 0"`);
+            await this.sleep(1000);
+            console.log("Animations disabled.");
+        }
+        catch (error) {
+            console.error("Failed to disable animations:", error);
             throw error;
         }
     }
@@ -633,7 +646,7 @@ class AndroidBot {
         });
     }
     // Execute adb command
-    executeCommand(command) {
+    executeCommand(command, logOutput = false) {
         console.log("exec: " + command);
         return new Promise((resolve, reject) => {
             (0, child_process_1.exec)(command, (error, stdout, stderr) => {
@@ -644,6 +657,10 @@ class AndroidBot {
                 //   return reject(new Error(`stderr: ${stderr}`));
                 // }
                 resolve(stdout.trim()); // Resolve with the standard output
+                if (logOutput) {
+                    console.log(stdout);
+                    console.log(stderr);
+                }
             });
         });
     }

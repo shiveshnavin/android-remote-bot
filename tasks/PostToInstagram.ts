@@ -1,4 +1,5 @@
 import PipeLane, { PipeTask, PipeTaskDescription } from 'pipelane';
+import { existsSync, statSync } from 'fs';
 import { ErrorOutput } from '../pipelane-server/server/pipe-tasks';
 import { AndroidBot } from '../bot';
 import { igEnterCaptionAndPost, igGoNextShare, shareFile, switchProfile } from '..';
@@ -119,15 +120,22 @@ export class PostToInstagram extends PipeTask<any, any> {
                 this.onLog(fileName, 'downloading to local:', localFile)
                 this.onLog('Posting start: ', caption)
                 await (bot.executeCommand(downloadCmd).catch(e => { }))
+
+                if (!existsSync(localFile) || statSync(localFile).size < 100) {
+                    throw new Error(`File not downloaded. ${localFile} is empty. Is the file deleted from remote?`);
+                }
                 this.onLog(localFile, 'pushing to device:', targetFile)
                 await bot.executeCommand(`adb push ${localFile} ${targetFile}`);
                 await bot.scanFile(targetFile);
                 await bot.setVolumeToZero()
                 await bot.startCopyClip()
                 await bot.pressBackKey(5)
+
+                await bot.disableAnimations()
                 if (model.tenant) {
                     await bot.openActivity("com.instagram.android/com.instagram.android.activity.MainTabActivity")
                     await bot.sleep(5000)
+                    this.onLog("Switching profile to ", model.tenant)
                     await switchProfile(model.tenant)
                 }
                 await shareFile(targetFile, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity")
