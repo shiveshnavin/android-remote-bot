@@ -17,6 +17,9 @@ if (!fs_1.default.existsSync(wsdir)) {
     fs_1.default.mkdirSync(wsdir);
 }
 class AndroidBot {
+
+    useTcpDevice = false;
+
     async startCopyClip() {
         try {
             // Start the Clipper app to handle clipboard operations
@@ -647,6 +650,12 @@ class AndroidBot {
     }
     // Execute adb command
     executeCommand(command, logOutput = false) {
+        if (this.useTcpDevice
+            && command.startsWith("adb ")
+            && !command.startsWith("adb connect")
+            && !command.startsWith("adb devices")) {
+            command = command.replace("adb ", "adb -e");
+        }
         console.log("exec: " + command);
         return new Promise((resolve, reject) => {
             (0, child_process_1.exec)(command, (error, stdout, stderr) => {

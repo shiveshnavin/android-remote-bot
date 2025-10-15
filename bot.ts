@@ -15,6 +15,7 @@ if (!fs.existsSync(wsdir)) {
 
 export class AndroidBot {
 
+  useTcpDevice = false;
 
   async startCopyClip() {
     try {
@@ -708,6 +709,12 @@ export class AndroidBot {
 
   // Execute adb command
   executeCommand(command: string, logOutput = false): Promise<string> {
+    if (this.useTcpDevice
+      && command.startsWith("adb ")
+      && !command.startsWith("adb connect")
+      && !command.startsWith("adb devices")) {
+      command = command.replace("adb ", "adb -e");
+    }
     console.log("exec: " + command)
     return new Promise((resolve, reject) => {
       exec(command, (error, stdout, stderr) => {
