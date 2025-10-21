@@ -429,13 +429,23 @@ export class AndroidBot {
    * @param runnable must return a non-null value to mark success, can return a promise
    * @param timeout 
    */
-  async waitFor(runnable: () => Promise<any>, timeout: number, pollInterval = 1000, label?: string) {
+  async waitFor(
+    runnable: () => Promise<any>,
+    timeout: number,
+    pollInterval = 1000,
+    label?: string,
+    softFail: boolean = false): Promise<any> {
     const startTime = Date.now();
     while (Date.now() - startTime < timeout) {
       if (label) {
         console.log(`Waiting for ${label}...`);
       }
-      const result = await runnable();
+      let result = await runnable();
+      try {
+        result = await runnable();
+      } catch (e) {
+        // ignore
+      }
       if (result) {
         return result;
       }
@@ -444,7 +454,10 @@ export class AndroidBot {
     if (label) {
       console.log(`waitFor timed out for ${label} after ${timeout}ms`);
     }
-    throw new Error(`waitFor timed out after ${timeout}ms`);
+    if (!softFail) {
+      throw new Error(`waitFor timed out after ${timeout}ms`);
+    }
+    return undefined
   }
 
 

@@ -1,5 +1,6 @@
 import { Node } from "./xml";
 export declare class AndroidBot {
+    useTcpDevice: boolean;
     startCopyClip(): Promise<void>;
     isConnected(): Promise<boolean>;
     connectToDevice(): Promise<void>;
@@ -35,7 +36,7 @@ export declare class AndroidBot {
      * @param runnable must return a non-null value to mark success, can return a promise
      * @param timeout
      */
-    waitFor(runnable: () => Promise<any>, timeout: number, pollInterval?: number, label?: string): Promise<any>;
+    waitFor(runnable: () => Promise<any>, timeout: number, pollInterval?: number, label?: string, softFail?: boolean): Promise<any>;
     findElementByResId(resId: string, screenJson?: any): Promise<Node>;
     findElementByAttribute(attr: string, value: string, screenJson?: any): Promise<Node>;
     findElementByLabel(label: string, screenJson?: any): Promise<Node>;

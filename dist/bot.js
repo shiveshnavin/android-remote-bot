@@ -17,9 +17,7 @@ if (!fs_1.default.existsSync(wsdir)) {
     fs_1.default.mkdirSync(wsdir);
 }
 class AndroidBot {
-
     useTcpDevice = false;
-
     async startCopyClip() {
         try {
             // Start the Clipper app to handle clipboard operations
@@ -395,13 +393,19 @@ class AndroidBot {
      * @param runnable must return a non-null value to mark success, can return a promise
      * @param timeout
      */
-    async waitFor(runnable, timeout, pollInterval = 1000, label) {
+    async waitFor(runnable, timeout, pollInterval = 1000, label, softFail = false) {
         const startTime = Date.now();
         while (Date.now() - startTime < timeout) {
             if (label) {
                 console.log(`Waiting for ${label}...`);
             }
-            const result = await runnable();
+            let result = await runnable();
+            try {
+                result = await runnable();
+            }
+            catch (e) {
+                // ignore
+            }
             if (result) {
                 return result;
             }
@@ -410,7 +414,10 @@ class AndroidBot {
         if (label) {
             console.log(`waitFor timed out for ${label} after ${timeout}ms`);
         }
-        throw new Error(`waitFor timed out after ${timeout}ms`);
+        if (!softFail) {
+            throw new Error(`waitFor timed out after ${timeout}ms`);
+        }
+        return undefined;
     }
     // Find element by attribute
     async findElementByResId(resId, screenJson) {

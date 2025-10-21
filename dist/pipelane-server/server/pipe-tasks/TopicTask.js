@@ -87,10 +87,14 @@ class TopicTask extends pipelane_1.PipeTask {
                     queue: 'queue name, defaults to pipelane name (read, write)',
                     id: 'topic id (read), optional',
                     state: 'topic state  (read)(write)',
-                    order: 'asc (default)(read), desc, ordered by createdTimestamp'
+                    order: 'asc (default)(read), desc, ordered by createdTimestamp',
+                    notifyOnExhausted: '(read) comma separated list of users to notify when queue is exhausted',
                 }
             }
         };
+    }
+    async notifyUser(user, message) {
+        this.onLog(`Notifying user ${user}: ${message}`);
     }
     async execute(pipeWorksInstance, input) {
         if (!this.initialized)
@@ -123,6 +127,12 @@ class TopicTask extends pipelane_1.PipeTask {
                         }
                     ]
                 });
+            }
+            if (topics.length === 0 && input.additionalInputs?.notifyOnExhausted) {
+                let users = input.additionalInputs.notifyOnExhausted.split(',').map(u => u.trim()).filter(u => u.length > 0);
+                for (let user of users) {
+                    await this.notifyUser(user, `[${pipeWorksInstance.name}] Queue ${queue} is exhausted.`);
+                }
             }
             pipeWorksInstance.inputs.topic = topics[0];
             pipeWorksInstance.inputs.topics = topics;

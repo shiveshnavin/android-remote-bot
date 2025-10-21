@@ -19,8 +19,13 @@ export declare class TopicTask extends PipeTask<InputWithPreviousInputs, OutputW
     constructor(variantName: string, db?: MultiDbORM, tableName?: string);
     initDb(): Promise<void>;
     describe(): PipeTaskDescription | undefined;
+    notifyUser(user: string, message: string): Promise<void>;
     execute(pipeWorksInstance: PipeLane, input: {
         last?: any[];
-        additionalInputs?: any;
+        additionalInputs?: Topic & {
+            notifyOnExhausted?: string;
+            limit?: number;
+            order?: 'asc' | 'desc';
+        };
     }): Promise<any[]>;
 }
