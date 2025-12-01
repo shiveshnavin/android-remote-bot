@@ -420,26 +420,26 @@ class AndroidBot {
         return undefined;
     }
     // Find element by attribute
-    async findElementByResId(resId, screenJson) {
+    async findElementByResId(resId, screenJson, strict = false) {
         const xml = new xml_1.XmlUtils();
         if (!screenJson) {
             screenJson = await this.dumpScreenXml();
         }
         xml.xmlJson = screenJson;
-        const node = await xml.findNodeByAttr("resource-id", resId);
+        const node = await xml.findNodeByAttr("resource-id", resId, strict);
         if (node) {
             console.log("Found node", `resource-id=${resId}`, '@', node.$.bounds);
             return node;
         }
     }
     // Find element by attribute
-    async findElementByAttribute(attr, value, screenJson) {
+    async findElementByAttribute(attr, value, screenJson, strict = false) {
         const xml = new xml_1.XmlUtils();
         if (!screenJson) {
             screenJson = await this.dumpScreenXml();
         }
         xml.xmlJson = screenJson;
-        const node = await xml.findNodeByAttr(attr, value);
+        const node = await xml.findNodeByAttr(attr, value, strict);
         if (node) {
             console.log("Found node", `${attr}=${value}`, '@', node.$.bounds);
             return node;

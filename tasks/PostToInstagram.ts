@@ -22,7 +22,7 @@ export type ScheduleModel = {
 
 interface PostToInstagramInputs {
     last: ScheduleModel[]
-    additionalInputs: ScheduleModelPayload;
+    additionalInputs: ScheduleModelPayload & { cleanup?: boolean };
 }
 
 export class PostToInstagram extends PipeTask<any, any> {
@@ -146,13 +146,15 @@ export class PostToInstagram extends PipeTask<any, any> {
                 model.status = true
                 model.message = `Posted successfully!`
 
-                if (coverUrl)
-                    await axios.delete(coverUrl).catch(e => {
-                        console.log('tolerable error deleting cover for ', fileName, e.message)
+                if (input.additionalInputs.cleanup) {
+                    if (coverUrl)
+                        await axios.delete(coverUrl).catch(e => {
+                            console.log('tolerable error deleting cover for ', fileName, e.message)
+                        })
+                    await axios.delete(url).catch(e => {
+                        console.log('tolerable error deleting', fileName, e.message)
                     })
-                await axios.delete(url).catch(e => {
-                    console.log('tolerable error deleting', fileName, e.message)
-                })
+                }
             } catch (error) {
                 await bot.pressBackKey(5)
                 console.log("Error processing schedule:", error);

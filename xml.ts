@@ -106,7 +106,7 @@ class XmlUtils {
   }
 
   // Find the node with the given attribute and value
-  async findNodeByAttr(attr: string, attrValue: string): Promise<Node | null> {
+  async findNodeByAttr(attr: string, attrValue: string, strict = false): Promise<Node | null> {
     // Parse the XML before searching
     if (!this.xmlJson) {
       await this.parseXml();
@@ -121,8 +121,16 @@ class XmlUtils {
         return null
       }
       // Check if the attribute matches the target value
-      if (node.$ && node.$[attr] && node.$[attr].includes(attrValue)) {
-        return node;
+      if (node.$ && node.$[attr]) {
+        if (strict) {
+          if (node.$[attr] === attrValue) {
+            return node;
+          }
+        } else {
+          if (node.$[attr].includes(attrValue)) {
+            return node;
+          }
+        }
       }
 
       // Recursively search through children if any

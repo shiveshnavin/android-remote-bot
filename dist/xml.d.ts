@@ -26,7 +26,7 @@ declare class XmlUtils {
     constructor(xmlString?: string);
     parseXml(xmlString?: string): Promise<any>;
     findNodeByLabel(label: string, strict?: boolean): Promise<Node | null>;
-    findNodeByAttr(attr: string, attrValue: string): Promise<Node | null>;
+    findNodeByAttr(attr: string, attrValue: string, strict?: boolean): Promise<Node | null>;
     getBounds(node: Node): {
         x: number;
         y: number;

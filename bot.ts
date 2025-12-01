@@ -464,14 +464,15 @@ export class AndroidBot {
   // Find element by attribute
   async findElementByResId(
     resId: string,
-    screenJson?: any
+    screenJson?: any,
+    strict = false
   ): Promise<Node> {
     const xml = new XmlUtils();
     if (!screenJson) {
       screenJson = await this.dumpScreenXml();
     }
     xml.xmlJson = screenJson;
-    const node = await xml.findNodeByAttr("resource-id", resId);
+    const node = await xml.findNodeByAttr("resource-id", resId, strict);
     if (node) {
       console.log("Found node", `resource-id=${resId}`, '@', node.$.bounds);
       return node;
@@ -482,14 +483,15 @@ export class AndroidBot {
   async findElementByAttribute(
     attr: string,
     value: string,
-    screenJson?: any
+    screenJson?: any,
+    strict = false
   ): Promise<Node> {
     const xml = new XmlUtils();
     if (!screenJson) {
       screenJson = await this.dumpScreenXml();
     }
     xml.xmlJson = screenJson;
-    const node = await xml.findNodeByAttr(attr, value);
+    const node = await xml.findNodeByAttr(attr, value, strict);
     if (node) {
       console.log("Found node", `${attr}=${value}`, '@', node.$.bounds);
       return node;

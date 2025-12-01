@@ -20,7 +20,9 @@ export type ScheduleModel = {
 } & ErrorOutput;
 interface PostToInstagramInputs {
     last: ScheduleModel[];
-    additionalInputs: ScheduleModelPayload;
+    additionalInputs: ScheduleModelPayload & {
+        cleanup?: boolean;
+    };
 }
 export declare class PostToInstagram extends PipeTask<any, any> {
     static TASK_VARIANT_NAME: string;

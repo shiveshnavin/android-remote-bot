@@ -116,13 +116,15 @@ class PostToInstagram extends pipelane_1.PipeTask {
                 await (0, __1.igEnterCaptionAndPost)(caption);
                 model.status = true;
                 model.message = `Posted successfully!`;
-                if (coverUrl)
-                    await axios_1.default.delete(coverUrl).catch(e => {
-                        console.log('tolerable error deleting cover for ', fileName, e.message);
+                if (input.additionalInputs.cleanup) {
+                    if (coverUrl)
+                        await axios_1.default.delete(coverUrl).catch(e => {
+                            console.log('tolerable error deleting cover for ', fileName, e.message);
+                        });
+                    await axios_1.default.delete(url).catch(e => {
+                        console.log('tolerable error deleting', fileName, e.message);
                     });
-                await axios_1.default.delete(url).catch(e => {
-                    console.log('tolerable error deleting', fileName, e.message);
-                });
+                }
             }
             catch (error) {
                 await bot.pressBackKey(5);

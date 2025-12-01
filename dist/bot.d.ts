@@ -37,8 +37,8 @@ export declare class AndroidBot {
      * @param timeout
      */
     waitFor(runnable: () => Promise<any>, timeout: number, pollInterval?: number, label?: string, softFail?: boolean): Promise<any>;
-    findElementByResId(resId: string, screenJson?: any): Promise<Node>;
-    findElementByAttribute(attr: string, value: string, screenJson?: any): Promise<Node>;
+    findElementByResId(resId: string, screenJson?: any, strict?: boolean): Promise<Node>;
+    findElementByAttribute(attr: string, value: string, screenJson?: any, strict?: boolean): Promise<Node>;
     findElementByLabel(label: string, screenJson?: any): Promise<Node>;
     clickAndHoldNode(node: Node, durationMs: number): Promise<void>;
     clickNode(node: Node): Promise<void>;

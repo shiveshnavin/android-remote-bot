@@ -85,8 +85,9 @@ export async function igEnterCaptionAndPost(caption: string): Promise<void> {
   if (!shared) {
     shareBtn = await bot.waitFor(() => (bot.findElementByAttribute(
       "resource-id",
-      "com.instagram.android:id/share_button"
-    )), 5000, 1000, 'share button').catch(e => {
+      "com.instagram.android:id/share_button",
+      true
+    )), 5000, 1000, 'share_button button').catch(e => {
       console.log("Error finding share button:", e.message);
       return null;
     });
@@ -95,6 +96,7 @@ export async function igEnterCaptionAndPost(caption: string): Promise<void> {
       await bot.sleep(1000);
       await bot.clickNode(shareBtn);
       shared = true;
+      console.log("Post shared using share_button");
     }
     let shareBtnByLabel = await bot.waitFor(() => (bot.findElementByLabel("Share")), 5000, 1000, 'share button by label').catch(e => {
       console.log("Error finding share button by label:", e.message);
@@ -105,6 +107,7 @@ export async function igEnterCaptionAndPost(caption: string): Promise<void> {
       await bot.sleep(1000);
       await bot.clickNode(shareBtnByLabel);
       shared = true;
+      console.log("Post shared using Share label");
     }
   }
 
@@ -125,6 +128,7 @@ export async function igEnterCaptionAndPost(caption: string): Promise<void> {
         await bot.sleep(1000);
         await bot.clickNode(shareBtn);
         shared = true;
+        console.log("Post shared using Next then Share");
       }
     }
   }
