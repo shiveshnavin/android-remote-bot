@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "noEmitOnError": false,
+        "jsx": "react",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "module": "nodenext",
+        "target": "esNext",
+        "declaration": true,
+        "outDir": "./dist",
+        "types": ["node"]
+    },
+    "include": ["**/**/**/*", "**/**/*.graphql", "**/*.json"],
+    "exclude": [
+        "node_modules/**/**/*",
+        "**/*.d.ts",
+        "pipelane-server/client/**",
+        "ui-dist/**"
+    ]
+}

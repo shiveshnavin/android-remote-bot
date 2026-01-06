@@ -1,0 +1,161 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.igGoNextShare = igGoNextShare;
+exports.igEnterCaptionAndPost = igEnterCaptionAndPost;
+exports.switchProfile = switchProfile;
+const bot_1 = require("./bot");
+const dotenv = __importStar(require("dotenv"));
+dotenv.config();
+const bot = new bot_1.AndroidBot();
+async function loginInstagram() {
+    if (!(await bot.isScreenOn())) {
+        await bot.turnOnScreen();
+    }
+    await bot.openActivity("com.instagram.android/com.instagram.android.activity.MainTabActivity");
+    let screenJson = await bot.dumpScreenXml();
+    let userNameField = await bot.findElementByLabel("Username", screenJson);
+    console.log("userNameField", userNameField);
+    if (userNameField) {
+        await bot.clickNode(userNameField);
+        await bot.sleep(2000);
+        await bot.clearInputField(10); // Assuming 10 is the number of key strokes
+        await bot.sleep(1000);
+        await bot.typeText(process.env.IG_USER || "");
+        let passwordField = await bot.findElementByLabel("Password", screenJson);
+        await bot.clickNode(passwordField);
+        await bot.clearInputField(10); // Assuming 10 is the number of key strokes
+        await bot.typeText("greatking");
+        await bot.sleep(1000);
+        await bot.pressEnterKey();
+        let loginBtn = await bot.findElementByLabel("Log in", screenJson);
+        await bot.clickNode(loginBtn);
+    }
+    else {
+        console.log("userNameField not found");
+        await bot.pressBackKey();
+    }
+}
+async function igGoNextShare() {
+    let screenJson = await bot.dumpScreenXml();
+    await bot.dismissBottomSheetIfPresent(screenJson);
+    let nextBtn = await bot.findElementByAttribute("content-desc", "Next", screenJson);
+    await bot.clickNode(nextBtn);
+}
+async function igEnterCaptionAndPost(caption) {
+    let screenJson = await bot.dumpScreenXml();
+    await bot.dismissBottomSheetIfPresent(screenJson);
+    let captionInput = await bot.findElementByAttribute("resource-id", "com.instagram.android:id/caption_input_text_view", screenJson);
+    await bot.clickNode(captionInput);
+    await bot.clearInputField(10);
+    await bot.sleep(1000);
+    await bot.typeText(caption);
+    await bot.sleep(3000);
+    await bot.hideKeyboardIfVisible();
+    await bot.sleep(2000);
+    screenJson = await bot.dumpScreenXml();
+    let shareBtn;
+    let shared = false;
+    if (!shared) {
+        shareBtn = await bot.waitFor(() => (bot.findElementByAttribute("resource-id", "com.instagram.android:id/share_button", true)), 5000, 1000, 'share_button button').catch(e => {
+            console.log("Error finding share button:", e.message);
+            return null;
+        });
+        if (shareBtn) {
+            await bot.clickNode(shareBtn);
+            await bot.sleep(1000);
+            await bot.clickNode(shareBtn);
+            shared = true;
+            console.log("Post shared using share_button");
+        }
+        let shareBtnByLabel = await bot.waitFor(() => (bot.findElementByLabel("Share")), 5000, 1000, 'share button by label').catch(e => {
+            console.log("Error finding share button by label:", e.message);
+            return null;
+        });
+        if (shareBtnByLabel) {
+            await bot.clickNode(shareBtnByLabel);
+            await bot.sleep(1000);
+            await bot.clickNode(shareBtnByLabel);
+            shared = true;
+            console.log("Post shared using Share label");
+        }
+    }
+    if (!shared) {
+        let nextBtn = await bot.waitFor(() => (bot.findElementByLabel("Next")), 5000, 1000, 'next btn button').catch(e => {
+            console.log("Error finding next button:", e.message);
+            return null;
+        });
+        if (nextBtn) {
+            await bot.clickNode(nextBtn);
+            shareBtn = await bot.waitFor(() => (bot.findElementByLabel("Share")), 5000, 1000, 'share button').catch(e => {
+                console.log("Error finding share button:", e.message);
+                return null;
+            });
+            if (shareBtn) {
+                await bot.clickNode(shareBtn);
+                await bot.sleep(1000);
+                await bot.clickNode(shareBtn);
+                shared = true;
+                console.log("Post shared using Next then Share");
+            }
+        }
+    }
+    if (!shared) {
+        throw new Error("Unable to find share button, post not shared");
+    }
+    console.log("Waiting for 5sec for Instagram to finish upload");
+    await bot.sleep(5000);
+    await bot.pressBackKey(5);
+}
+async function shareAndPost() {
+    const filePath = "/storage/emulated/0/Download/ttxx.mp4";
+    await bot.shareVideoByFile(filePath, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity");
+    await igGoNextShare();
+    await igEnterCaptionAndPost("test caption");
+}
+async function switchProfile(newUserName) {
+    let screenJson = await bot.dumpScreenXml();
+    let profileBtn = await bot.findElementByAttribute("resource-id", "com.instagram.android:id/profile_tab", screenJson);
+    await bot.clickAndHoldNode(profileBtn, 2000);
+    screenJson = await bot.dumpScreenXml();
+    let userBtn = await bot.findElementByAttribute("text", newUserName.trim(), screenJson);
+    if (userBtn) {
+        await bot.clickNode(userBtn);
+    }
+    else {
+        throw new Error(`Unable to find user ${newUserName} in list of profiles. is the account logged in?`);
+    }
+}
+// shareAndPost();
