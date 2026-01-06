@@ -13,6 +13,7 @@ import { ExecuteBotActionTask } from './tasks/ExecuteBotActionTask'
 import { AndroidBot } from './bot'
 import { EvaluateJsTask } from './pipelane-server/server/pipe-tasks/EvaluateJsTask'
 import { LoopEvaluateJsTask } from './pipelane-server/server/pipe-tasks/LoopEvaluateJsTask'
+import { PostToYoutube } from './tasks/PostToYoutube'
 const app = express()
 const firebaseCreds = fs.readFileSync('firebase-creds.json').toString()
 const dbCreds = JSON.parse(firebaseCreds)
@@ -39,7 +40,7 @@ VariantConfig[FetchSchedulesTask.TASK_TYPE_NAME] = [new FetchSchedulesTask(db)]
 //@ts-ignore
 VariantConfig[UpdateSchedulesTask.TASK_TYPE_NAME] = [new UpdateSchedulesTask(db)]
 //@ts-ignore
-VariantConfig[PostToInstagram.TASK_TYPE_NAME] = [new PostToInstagram(bot)]
+VariantConfig[PostToInstagram.TASK_TYPE_NAME] = [new PostToInstagram(bot), new PostToYoutube(bot)]
 VariantConfig[EvaluateJsTask.TASK_TYPE_NAME] = [
     new LoopEvaluateJsTask(),
     new ExecuteBotActionTask(bot)

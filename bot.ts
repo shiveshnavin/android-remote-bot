@@ -105,10 +105,27 @@ export class AndroidBot {
     }
   }
 
+
+  async shareVideoByFile(filePath: string, activity?: string, packageName?: string): Promise<void> {
+    await this.scanFile(filePath);
+    let mediaId = await this.getMediaIdFromPath(filePath);
+    console.log("Inserted mediaId", mediaId);
+    if (mediaId) {
+      await bot.shareVideoById(
+        mediaId,
+        activity,
+        packageName
+      );
+    } else {
+      throw new Error("did scan failed? No mediaId found for file " + filePath)
+    }
+  }
+
+
   // Method to share video by media ID
-  async shareVideoById(mediaId: string, targetActivity: string): Promise<void> {
+  async shareVideoById(mediaId: string, targetActivity?: string, targetPackage?: string): Promise<void> {
     try {
-      const shareCommand = ` adb shell am start -a android.intent.action.SEND   -t video/*   --eu android.intent.extra.STREAM content://media/external/video/media/${mediaId}   -n ${targetActivity}   --grant-read-uri-permission`;
+      const shareCommand = ` adb shell am start -a android.intent.action.SEND   -t video/*   --eu android.intent.extra.STREAM content://media/external/video/media/${mediaId}  ${targetActivity ? `-n ${targetActivity}` : ''} ${targetPackage ? `-p ${targetPackage}` : ''}   --grant-read-uri-permission`;
       await this.executeCommand(shareCommand);
 
       console.log(`Successfully shared media ${mediaId} to ${targetActivity}.`);
@@ -326,6 +343,20 @@ export class AndroidBot {
     const y = Math.floor(height * 0.1); // 10% of the height
 
     // Run the ADB tap command
+    const command = `adb shell input tap ${x} ${y}`;
+    await this.executeCommand(command);
+  }
+
+
+  async clickAtCenter(): Promise<void> {
+    const sizeOutput = await this.executeCommand(`adb shell wm size`);
+    const match = sizeOutput.match(/Physical size:\s*(\d+)x(\d+)/);
+    if (!match) throw new Error("Unable to determine screen size");
+
+    const width = parseInt(match[1], 10);
+    const height = parseInt(match[2], 10);
+    const x = Math.floor(width / 2); // Center of width
+    const y = Math.floor(height / 2); // Center of height
     const command = `adb shell input tap ${x} ${y}`;
     await this.executeCommand(command);
   }

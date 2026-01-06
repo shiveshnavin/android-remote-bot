@@ -2,12 +2,12 @@ import PipeLane, { PipeTask, PipeTaskDescription } from 'pipelane';
 import { existsSync, statSync } from 'fs';
 import { ErrorOutput } from '../pipelane-server/server/pipe-tasks';
 import { AndroidBot } from '../bot';
-import { igEnterCaptionAndPost, igGoNextShare, shareFile, switchProfile } from '..';
+import { igEnterCaptionAndPost, igGoNextShare, switchProfile } from '../post-instagram';
 import axios from 'axios';
 export type ScheduleModelPayload = {
     generated_cover_file_url: string;
     generated_file_url: string;
-    outpotPostItem: string | { text: string };
+    outpotPostItem: string | { text: string, text_small?: string };
 }
 export type ScheduleModel = {
     id: string;
@@ -30,8 +30,8 @@ export class PostToInstagram extends PipeTask<any, any> {
     static TASK_TYPE_NAME: string = 'android-bot';
 
     bot: AndroidBot
-    constructor(bot?: AndroidBot) {
-        super(PostToInstagram.TASK_TYPE_NAME, PostToInstagram.TASK_VARIANT_NAME);
+    constructor(bot?: AndroidBot, variantName?: string) {
+        super(PostToInstagram.TASK_TYPE_NAME, variantName || PostToInstagram.TASK_VARIANT_NAME);
         this.bot = bot || new AndroidBot()
     }
 
@@ -68,6 +68,21 @@ export class PostToInstagram extends PipeTask<any, any> {
                 },
             },
         };
+    }
+
+    async post(model?: ScheduleModel, targetFile?: string, outpotPostItem?: { text: string, text_small?: string }) {
+        let bot = this.bot
+        if (model.tenant) {
+            await bot.openActivity("com.instagram.android/com.instagram.android.activity.MainTabActivity")
+            await bot.sleep(5000)
+            this.onLog("Switching profile to ", model.tenant)
+            await switchProfile(model.tenant)
+        }
+        await bot.shareVideoByFile(targetFile, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity")
+        await bot.sleep(5000)
+        await igGoNextShare()
+        await bot.sleep(2000)
+        await igEnterCaptionAndPost(outpotPostItem.text)
     }
 
     posted = []
@@ -132,17 +147,7 @@ export class PostToInstagram extends PipeTask<any, any> {
                 await bot.pressBackKey(5)
 
                 await bot.disableAnimations()
-                if (model.tenant) {
-                    await bot.openActivity("com.instagram.android/com.instagram.android.activity.MainTabActivity")
-                    await bot.sleep(5000)
-                    this.onLog("Switching profile to ", model.tenant)
-                    await switchProfile(model.tenant)
-                }
-                await shareFile(targetFile, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity")
-                await bot.sleep(5000)
-                await igGoNextShare()
-                await bot.sleep(2000)
-                await igEnterCaptionAndPost(caption)
+                await this.post(model, targetFile, outpotPostItem)
                 model.status = true
                 model.message = `Posted successfully!`
 

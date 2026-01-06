@@ -1,6 +1,4 @@
 import { AndroidBot } from "./bot";
-import { XmlUtils } from "./xml";
-import * as fs from "fs";
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -38,18 +36,6 @@ async function loginInstagram(): Promise<void> {
   } else {
     console.log("userNameField not found");
     await bot.pressBackKey();
-  }
-}
-
-export async function shareFile(filePath: string, activity: string): Promise<void> {
-  await bot.scanFile(filePath);
-  let mediaId = await bot.getMediaIdFromPath(filePath);
-  console.log("Inserted mediaId", mediaId);
-  if (mediaId) {
-    await bot.shareVideoById(
-      mediaId,
-      activity
-    );
   }
 }
 
@@ -143,7 +129,7 @@ export async function igEnterCaptionAndPost(caption: string): Promise<void> {
 
 async function shareAndPost(): Promise<void> {
   const filePath = "/storage/emulated/0/Download/ttxx.mp4";
-  await shareFile(filePath, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity");
+  await bot.shareVideoByFile(filePath, "com.instagram.android/com.instagram.share.handleractivity.ShareHandlerActivity");
   await igGoNextShare();
   await igEnterCaptionAndPost("test caption");
 }
