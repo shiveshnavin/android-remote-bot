@@ -49,9 +49,9 @@ function generatePipelaneResolvers(db, variantConfig, cronScheduler, defaultExec
                     name: pipe.name
                 }, {
                     sort: [{
-                        field: 'startTime',
-                        order: 'asc'
-                    }],
+                            field: 'startTime',
+                            order: 'asc'
+                        }],
                     limit: Math.round(count / 2)
                 }).then(async (executions) => {
                     if (executions && executions.length > 0) {
@@ -99,12 +99,16 @@ function generatePipelaneResolvers(db, variantConfig, cronScheduler, defaultExec
                     pipelaneName: parent.pipelaneName
                 });
             },
+            output: async (parent) => {
+                let cached = cronScheduler.executionsCache.find(ex => ex.instanceId === parent.id);
+                let output = Object.assign({}, typeof parent.output === 'string' ? JSON.parse(parent.output) : parent.output, cached?.outputs || {});
+                return JSON.stringify(output);
+            },
             tasks: async (parent) => {
                 if (parent.tasks)
                     return parent.tasks;
                 let cached = cronScheduler.executionsCache.find(ex => ex.instanceId === parent.id);
                 if (cached) {
-                    //@ts-ignore
                     let tasks = (0, utils_1.getTasksExecFromPipelane)(cached);
                     if (tasks && tasks.length > 0)
                         return tasks;
@@ -113,9 +117,9 @@ function generatePipelaneResolvers(db, variantConfig, cronScheduler, defaultExec
                     pipelaneExId: parent.id
                 }, {
                     sort: [{
-                        field: 'startTime',
-                        order: 'asc'
-                    }]
+                            field: 'startTime',
+                            order: 'asc'
+                        }]
                 });
                 return tasks || [];
             }
@@ -169,9 +173,9 @@ function generatePipelaneResolvers(db, variantConfig, cronScheduler, defaultExec
                     pipelaneName: parent.name
                 }, {
                     sort: [{
-                        field: 'step',
-                        order: 'asc'
-                    }]
+                            field: 'step',
+                            order: 'asc'
+                        }]
                 });
                 return tasks || [];
             },
@@ -216,9 +220,9 @@ function generatePipelaneResolvers(db, variantConfig, cronScheduler, defaultExec
             pipelaneTasks: async (parent, arg) => {
                 let pls = await db.get(db_1.TableName.PS_PIPELANE_TASK, { pipelaneName: arg.pipelaneName }, {
                     sort: [{
-                        field: 'step',
-                        order: 'asc'
-                    }]
+                            field: 'step',
+                            order: 'asc'
+                        }]
                 });
                 return pls;
             },
@@ -226,9 +230,9 @@ function generatePipelaneResolvers(db, variantConfig, cronScheduler, defaultExec
                 let data = await db.get(db_1.TableName.PS_PIPELANE_EXEC, {}, {
                     limit: request.limit || 50,
                     sort: [{
-                        field: 'startTime',
-                        order: 'desc'
-                    }]
+                            field: 'startTime',
+                            order: 'desc'
+                        }]
                 });
                 return data?.filter(dt => dt.name && dt.id && dt.startTime);
             },
@@ -238,9 +242,9 @@ function generatePipelaneResolvers(db, variantConfig, cronScheduler, defaultExec
                 }, {
                     limit: arg.limit || 50,
                     sort: [{
-                        field: 'startTime',
-                        order: 'desc'
-                    }]
+                            field: 'startTime',
+                            order: 'desc'
+                        }]
                 });
             }
         },

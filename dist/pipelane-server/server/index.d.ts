@@ -5,6 +5,7 @@ export declare function creatPipelaneServer(variantConfig: TaskVariantConfig, pe
 declare let dummyResolver: {
     PipelaneExecution: {
         definition: (parent: any) => Promise<import("../gen/model").Pipetask>;
+        output: (parent: import("../gen/model").PipelaneExecution) => Promise<string>;
         tasks: (parent: import("../gen/model").PipelaneExecution) => Promise<any[]>;
     };
     Pipetask: {

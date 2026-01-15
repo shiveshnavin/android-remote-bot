@@ -5,6 +5,7 @@ import { CronScheduler } from "../cron";
 export declare function generatePipelaneResolvers(db: MultiDbORM, variantConfig: TaskVariantConfig, cronScheduler?: CronScheduler, defaultExecutionRetentionCountPerPipe?: number): {
     PipelaneExecution: {
         definition: (parent: any) => Promise<Pipetask>;
+        output: (parent: PipelaneExecution) => Promise<string>;
         tasks: (parent: PipelaneExecution) => Promise<any[]>;
     };
     Pipetask: {
