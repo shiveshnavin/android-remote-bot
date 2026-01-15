@@ -1,5 +1,5 @@
 import express from 'express'
-import { creatPipelaneServer } from './pipelane-server'
+import { creatPipelaneServer, FirebaseAdapterMultiDbOrm } from './pipelane-server'
 import { FireStoreDB } from 'multi-db-orm'
 import fs from 'fs'
 import { VariantConfig } from './pipelane-server/server/pipe-tasks'
@@ -14,10 +14,12 @@ import { AndroidBot } from './bot'
 import { EvaluateJsTask } from './pipelane-server/server/pipe-tasks/EvaluateJsTask'
 import { LoopEvaluateJsTask } from './pipelane-server/server/pipe-tasks/LoopEvaluateJsTask'
 import { PostToYoutube } from './tasks/PostToYoutube'
+
+
 const app = express()
 const firebaseCreds = fs.readFileSync('firebase-creds.json').toString()
 const dbCreds = JSON.parse(firebaseCreds)
-const db = new FireStoreDB(dbCreds)
+const db = new FirebaseAdapterMultiDbOrm(dbCreds)
 
 // must use FireStoreDB with this only
 initRemoteCommand(db)

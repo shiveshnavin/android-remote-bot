@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const pipelane_server_1 = require("./pipelane-server");
-const multi_db_orm_1 = require("multi-db-orm");
 const fs_1 = __importDefault(require("fs"));
 const pipe_tasks_1 = require("./pipelane-server/server/pipe-tasks");
 const FetchSchedulesTask_1 = require("./tasks/FetchSchedulesTask");
@@ -20,7 +19,7 @@ const PostToYoutube_1 = require("./tasks/PostToYoutube");
 const app = (0, express_1.default)();
 const firebaseCreds = fs_1.default.readFileSync('firebase-creds.json').toString();
 const dbCreds = JSON.parse(firebaseCreds);
-const db = new multi_db_orm_1.FireStoreDB(dbCreds);
+const db = new pipelane_server_1.FirebaseAdapterMultiDbOrm(dbCreds);
 // must use FireStoreDB with this only
 (0, remote_command_1.initRemoteCommand)(db);
 const PORT = process.env.PORT || 8080;

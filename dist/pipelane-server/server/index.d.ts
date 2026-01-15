@@ -1,6 +1,7 @@
 import { TaskVariantConfig } from "pipelane";
 import { CronScheduler } from "./cron";
 import { MultiDbORM, MySQLDBConfig } from "multi-db-orm";
+export { FirebaseAdapterMultiDbOrm } from './utils/FirebaseAdapterMultiDbOrm';
 export declare function creatPipelaneServer(variantConfig: TaskVariantConfig, persistance?: MultiDbORM | MySQLDBConfig, pipelaneLogLevel?: 0 | 1 | 2 | 3 | 4 | 5): Promise<import("express-serve-static-core").Express>;
 declare let dummyResolver: {
     PipelaneExecution: {
@@ -60,4 +61,3 @@ export type PipelaneServerServices = {
     cron: CronScheduler;
     resolvers: typeof dummyResolver;
 };
-export {};

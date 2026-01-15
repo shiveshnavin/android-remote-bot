@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.FirebaseAdapterMultiDbOrm = void 0;
 exports.creatPipelaneServer = creatPipelaneServer;
 const express_1 = __importDefault(require("express"));
 const server_1 = require("@apollo/server");
@@ -20,6 +21,8 @@ const ui = express_1.default.Router();
 ui.all('*', express_1.default.static(path_1.default.join(__dirname, '../client/dist')), (req, res) => {
     res.sendFile(path_1.default.join(__dirname, '../client/dist/index.html'));
 });
+var FirebaseAdapterMultiDbOrm_1 = require("./utils/FirebaseAdapterMultiDbOrm");
+Object.defineProperty(exports, "FirebaseAdapterMultiDbOrm", { enumerable: true, get: function () { return FirebaseAdapterMultiDbOrm_1.FirebaseAdapterMultiDbOrm; } });
 async function creatPipelaneServer(variantConfig, persistance, pipelaneLogLevel = 2) {
     let db;
     //@ts-ignore
