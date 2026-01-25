@@ -449,9 +449,12 @@ class PipelaneExecCleaner {
     // main entry — call on each new execution
     async handleExecution(pipeEx, pipe) {
         try {
-            pipe = pipe || (await this.PipelaneResolvers.Query.Pipelane(undefined, { name: pipeEx.name || pipe.name }));
-            if (!pipe)
+        if (!pipeEx?.name && !pipe?.name) {
                 return;
+            }
+            pipe = pipe || (await this.PipelaneResolvers.Query.Pipelane(undefined, { name: pipeEx?.name || pipe?.name }));
+            if (!pipe) return;
+
             const pipelaneName = pipe.name;
             const counter = await this.initCounterIfMissing(pipelaneName);
             // Determine retention and overflow
