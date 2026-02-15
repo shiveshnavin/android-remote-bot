@@ -1,4 +1,4 @@
-import PipeLane, { TaskVariantConfig } from "pipelane";
+import PipeLane, { TaskVariantConfig, PipeTask, OutputWithStatus } from "pipelane";
 import { PipelaneExecution, Pipelane as PipelaneSchedule, Status } from "../../gen/model";
 import { Cron } from "croner";
 export declare class CronScheduler {
@@ -14,10 +14,11 @@ export declare class CronScheduler {
     pipelaneResolver: any;
     variantConfig: TaskVariantConfig;
     pipelaneLogLevel: 0 | 1 | 2 | 3 | 4 | 5;
+    listeners: Map<string, PipelaneExecutionListener>;
     constructor(variantConfig: TaskVariantConfig, pipelaneLogLevel?: 0 | 1 | 2 | 3 | 4 | 5, maxCacheSize?: number);
     getPipelaneDefinition(pipeName: string, existing?: PipelaneSchedule): Promise<PipelaneSchedule | undefined>;
     init(initialSchedules: PipelaneSchedule[], pipelaneResolver: any): void;
-    stopJob(name: String): void;
+    stopJob(instanceId: String): void;
     stopAll(): void;
     startAll(): void;
     addToSchedule(pl: PipelaneSchedule): void;
@@ -26,13 +27,16 @@ export declare class CronScheduler {
         job: Cron;
     };
     schedulePipelaneCronjob(pl: PipelaneSchedule): void;
-    triggerPipelane(pl: PipelaneSchedule, input?: string): Promise<PipelaneExecution | undefined>;
+    createInstanceId(name: string): string;
+    attachListenerToPipelane(name: string, listener: PipelaneExecutionListener): Promise<void>;
+    triggerPipelaneByName(name: string, input?: string, listener?: PipelaneExecutionListener, instanceId?: string): Promise<PipelaneExecution | undefined>;
+    triggerPipelane(pl: PipelaneSchedule, input?: string, listener?: PipelaneExecutionListener, instanceId?: string): Promise<PipelaneExecution | undefined>;
     pipelineLocks: Map<string, Promise<void>>;
     private acquirePipelineSlot;
     private lock;
     listenToPipe(pipelaneInstance: PipeLane, plx: PipelaneExecution, onResult?: (output: ({
         status: Status;
-    } & any)[]) => void): void;
+    } & any)[]) => void, listener?: PipelaneExecutionListener): void;
     validateCronString(cronString: string): any;
     getNextRun(cronExpression: string): Date;
     isPipeRunnable(schedule: PipelaneSchedule): boolean;
@@ -43,3 +47,5 @@ export declare class CronScheduler {
  * @returns {Number} The number of seconds until the next cron run.
  */
 export declare function getSecondsUntilNextCronRun(cronExpression: any, timestamp?: Date): number;
+export type EventType = 'NEW_TASK' | 'TASK_FINISHED' | 'SKIPPED' | 'COMPLETE';
+export type PipelaneExecutionListener = (pipelaneInstance: PipeLane, event: EventType, task: PipeTask<any, any>, output: OutputWithStatus[], plx: PipelaneExecution) => void;

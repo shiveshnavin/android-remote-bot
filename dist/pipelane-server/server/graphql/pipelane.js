@@ -386,11 +386,7 @@ function generatePipelaneResolvers(db, variantConfig, cronScheduler, defaultExec
                 return existing;
             },
             async executePipelane(parent, request) {
-                let existing = await PipelaneResolvers.Query.Pipelane(parent, request);
-                if (!existing) {
-                    throw new graphql_1.GraphQLError(`${request.name} does not exist.`);
-                }
-                let execution = await cronScheduler.triggerPipelane(existing, JSON.stringify(Object.assign(JSON.parse(existing.input), JSON.parse(request.input || '{}'))));
+                let execution = await cronScheduler.triggerPipelaneByName(request.name, request.input);
                 if (!execution) {
                     throw new graphql_1.GraphQLError("Error triggering pipelane, perhaps it is disabled?");
                 }
@@ -449,12 +445,12 @@ class PipelaneExecCleaner {
     // main entry — call on each new execution
     async handleExecution(pipeEx, pipe) {
         try {
-        if (!pipeEx?.name && !pipe?.name) {
+            if (!pipeEx?.name && !pipe?.name) {
                 return;
             }
             pipe = pipe || (await this.PipelaneResolvers.Query.Pipelane(undefined, { name: pipeEx?.name || pipe?.name }));
-            if (!pipe) return;
-
+            if (!pipe)
+                return;
             const pipelaneName = pipe.name;
             const counter = await this.initCounterIfMissing(pipelaneName);
             // Determine retention and overflow
@@ -510,7 +506,7 @@ class PipelaneExecCleaner {
                     await this.persistMeta(pipelaneName, counter.count);
                     return;
                 }
-                console.log(`[pipelane-server] Trimming ${pipelaneName}: deleting ${oldest.length} oldest executions.`);
+                console.log(`[pipelane-server] Trimming ${pipelaneName}: deleting ${oldest.length} oldest executions. Total=${counter.count}`);
                 // Delete oldest and their task-execs, waiting for completion
                 await Promise.all(oldest.map(async (e) => {
                     await this.db.delete(db_1.TableName.PS_PIPELANE_TASK_EXEC, { pipelaneExId: e.id });
@@ -519,7 +515,7 @@ class PipelaneExecCleaner {
                 // *** FAST PATH: avoid full table scan. ***
                 // We know how many we just deleted, so adjust the in-memory counter directly.
                 const deleted = oldest.length; // actual number deleted
-                counter.count = toDelete > deleted? 0:  Math.max(0, (counter.count || 0) - deleted);
+                counter.count = toDelete > deleted ? 0 : Math.max(0, (counter.count || 0) - deleted);
                 counter.dirtySincePersist = 0;
                 // Persist the new count (single source of truth for other processes)
                 await this.persistMeta(pipelaneName, counter.count);
