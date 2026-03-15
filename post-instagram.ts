@@ -138,15 +138,22 @@ async function shareAndPost(): Promise<void> {
 export async function switchProfile(newUserName: string) {
   let screenJson = await bot.dumpScreenXml()
   let profileBtn = await bot.findElementByAttribute("resource-id", "com.instagram.android:id/profile_tab", screenJson)
-  await bot.clickNode(profileBtn)
-  // await bot.clickAndHoldNode(profileBtn, 2000)
+  await bot.clickAndHoldNode(profileBtn, 2000)
   screenJson = await bot.dumpScreenXml()
   let userBtn = await bot.findElementByAttribute("text", newUserName.trim(), screenJson)
   if (userBtn) {
     await bot.clickNode(userBtn)
   }
   else {
-    throw new Error(`Unable to find user ${newUserName} in list of profiles. is the account logged in?`)
+    console.log(`Unable to find user ${newUserName} in list of profiles using HOLD method. trying again usinc click...`)
+    await bot.clickNode(profileBtn)
+    userBtn = await bot.findElementByAttribute("text", newUserName.trim(), screenJson)
+    if (userBtn) {
+      await bot.clickNode(userBtn)
+    }
+    else {
+      throw new Error(`Unable to find user ${newUserName} in list of profiles. is the account logged in?`)
+    }
   }
 }
 
