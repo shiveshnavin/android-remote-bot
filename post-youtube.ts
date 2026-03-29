@@ -50,6 +50,8 @@ export async function switchYtProfile(newUserName: string) {
   await bot.clickNode(settingsButton)
   await bot.sleep(2000)
   let switchAccountButton = await bot.findElementByAttribute("text", "Switch account")
+  if (!switchAccountButton)
+    switchAccountButton = await bot.findElementByAttribute("text", "Switch")
   await bot.clickNode(switchAccountButton)
   await bot.sleep(5000)
   let accountToSwitch = await bot.findElementByAttribute("text", `@${user}`)
