@@ -81,7 +81,7 @@ async function switchYtProfile(newUserName) {
         switchAccountButton = await bot.findElementByAttribute("text", "Switch")
     await bot.clickNode(switchAccountButton);
     await bot.sleep(5000);
-    let accountToSwitch = await bot.findElementByAttribute("text", `@${user}`);
+    let accountToSwitch = await bot.findElementByAttribute("text", `${user}`);
     if (!accountToSwitch) {
         throw new Error(`Unable to find youtube account with name ${user}`);
     }
