@@ -33,13 +33,28 @@ class PostToYoutube extends PostToInstagram_1.PostToInstagram {
         await bot.sleep(1000);
         await (0, post_youtube_1.ytGoNextShare)(); // next 1
         await bot.sleep(1000);
-        await (0, post_youtube_1.ytGoNextShare)().catch(async (e) => {
-            let uploadBtn = await bot.findElementByAttribute("text", "Upload");
-            this.onLog("2nd Next button not found", !!uploadBtn ? 'but upload button is there, so continuing (probably not a short)' : '');
-            if (!!uploadBtn) {
+        try {
+            await (0, post_youtube_1.ytGoNextShare)().catch(async (e) => {
+                let uploadBtn = await bot.findElementByAttribute("text", "Upload");
+                console.log("2nd Next button not found", !!uploadBtn ? 'but upload button is there, so continuing (probably not a short)' : '');
+                if (!uploadBtn) {
+                    throw e;
+                }
+                else {
+                    throw new Error('Not a short');
+                }
+            }); // next 2
+        }
+        catch (e) {
+            if (e?.message?.includes('Not a short')) {
+                console.log('We onyl support shorts, Skipping video that is probably not a short but marking it as completed so as to not block the other schedules! Check the generation!');
+                bot.killApp('com.google.android.youtube');
+                return;
+            }
+            else {
                 throw e;
             }
-        }); // next 2
+        }
         await bot.sleep(2000);
         await (0, post_youtube_1.ytEnterCaptionAndPost)(outputPostItem.text_small || 'Check this out !');
     }

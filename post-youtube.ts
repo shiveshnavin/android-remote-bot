@@ -9,9 +9,6 @@ export async function ytGoNextShare(): Promise<void> {
   let screenJson = await bot.dumpScreenXml();
   await bot.dismissBottomSheetIfPresent(screenJson)
   let nextBtn = await bot.findElementByAttribute("text", "Next", screenJson);
-  if (!nextBtn) {
-    nextBtn = await bot.findElementByAttribute("text", "Upload", screenJson);
-  }
   await bot.clickNode(nextBtn);
 }
 
