@@ -33,7 +33,13 @@ class PostToYoutube extends PostToInstagram_1.PostToInstagram {
         await bot.sleep(1000);
         await (0, post_youtube_1.ytGoNextShare)(); // next 1
         await bot.sleep(1000);
-        await (0, post_youtube_1.ytGoNextShare)(); // next 2
+        await (0, post_youtube_1.ytGoNextShare)().catch(async (e) => {
+            let uploadBtn = await bot.findElementByAttribute("text", "Upload");
+            this.onLog("2nd Next button not found", !!uploadBtn ? 'but upload button is there, so continuing (probably not a short)' : '');
+            if (!!uploadBtn) {
+                throw e;
+            }
+        }); // next 2
         await bot.sleep(2000);
         await (0, post_youtube_1.ytEnterCaptionAndPost)(outputPostItem.text_small || 'Check this out !');
     }

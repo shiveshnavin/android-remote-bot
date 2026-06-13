@@ -9,6 +9,9 @@ export async function ytGoNextShare(): Promise<void> {
   let screenJson = await bot.dumpScreenXml();
   await bot.dismissBottomSheetIfPresent(screenJson)
   let nextBtn = await bot.findElementByAttribute("text", "Next", screenJson);
+  if (!nextBtn) {
+    nextBtn = await bot.findElementByAttribute("text", "Next", screenJson);
+  }
   await bot.clickNode(nextBtn);
 }
 
@@ -29,6 +32,9 @@ export async function ytEnterCaptionAndPost(caption: string): Promise<void> {
   await bot.sleep(2000);
   screenJson = await bot.dumpScreenXml();
   let shareBtn = await bot.findElementByAttribute("text", "Upload Short")
+  if (!shareBtn) {
+    shareBtn = await bot.findElementByAttribute("text", "Upload")
+  }
   if (shareBtn) {
     await bot.clickNode(shareBtn)
   }

@@ -39,7 +39,13 @@ export class PostToYoutube extends PostToInstagram {
         await ytGoNextShare() // next 1
         await bot.sleep(1000)
 
-        await ytGoNextShare() // next 2
+        await ytGoNextShare().catch(async (e) => {
+            let uploadBtn = await bot.findElementByAttribute("text", "Upload")
+            this.onLog("2nd Next button not found", !!uploadBtn ? 'but upload button is there, so continuing (probably not a short)' : '')
+            if (!!uploadBtn) {
+                throw e
+            }
+        }) // next 2
         await bot.sleep(2000)
         await ytEnterCaptionAndPost(outputPostItem.text_small || 'Check this out !')
     }
