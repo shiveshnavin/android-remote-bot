@@ -74,8 +74,12 @@ async function ytEnterCaptionAndPost(caption) {
 }
 async function switchYtProfile(newUserName) {
     let user = newUserName;
-    let youButton = await bot.findElementByAttribute("resource-id", "com.google.android.youtube:id/pivot_bar_thumbnail");
+    let youButton = await bot.findElementByAttribute("content-desc", "You", undefined, true);
+    if (!youButton) {
+        youButton = await bot.findElementByAttribute("resource-id", "com.google.android.youtube:id/pivot_bar_thumbnail");
+    }
     await bot.clickNode(youButton);
+    await bot.sleep(2000);
     let settingsButton = await bot.findElementByAttribute("content-desc", "Settings");
     await bot.clickNode(settingsButton);
     await bot.sleep(2000);
